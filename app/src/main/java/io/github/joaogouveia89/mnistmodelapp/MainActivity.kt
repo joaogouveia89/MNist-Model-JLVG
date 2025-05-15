@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.camera.compose.CameraXViewfinder
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -100,24 +101,32 @@ fun MainScreen(
 
 @Composable
 fun CameraPreviewContent(
-    viewModel: MainViewModel,
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 ) {
-    val surfaceRequest by viewModel.surfaceRequest.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(lifecycleOwner) {
         viewModel.bindToCamera(context.applicationContext, lifecycleOwner)
     }
 
-    surfaceRequest?.let { request ->
-
+    uiState.surfaceRequest?.let { request ->
         Box(modifier = Modifier.fillMaxSize()){
             CameraXViewfinder(
                 surfaceRequest = request,
                 modifier = modifier
             )
             CameraMaskOverlay()
+            uiState.prediction?.let { prediction ->
+                Text(
+                    modifier = modifier
+                        .background(Color.White)
+                        .padding(12.dp)
+                        .align(Alignment.BottomCenter),
+                    text = "Prediction: $prediction",
+                )
+            }
         }
     }
 }
