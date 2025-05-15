@@ -42,6 +42,7 @@ import io.github.joaogouveia89.mnistmodelapp.ui.theme.MNistModelAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val viewModel: MainViewModel by viewModels()
 
         enableEdgeToEdge()
