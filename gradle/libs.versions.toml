@@ -37,6 +37,8 @@ androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.r
 # The helper library to grant the camera permission
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

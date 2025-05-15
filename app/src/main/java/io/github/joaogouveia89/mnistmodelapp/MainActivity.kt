@@ -8,15 +8,24 @@ import androidx.activity.viewModels
 import androidx.camera.compose.CameraXViewfinder
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +43,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
@@ -74,28 +84,64 @@ fun MainScreen(
             modifier = modifier
         )
     } else {
-        Column(
-            modifier = modifier.fillMaxSize().wrapContentSize().widthIn(max = 480.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        CameraPermissionScreen(
+            modifier = modifier,
+            cameraPermissionState = cameraPermissionState
+        )
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun CameraPermissionScreen(
+    cameraPermissionState: PermissionState,
+    modifier: Modifier = Modifier
+) {
+    val textToShow = if (cameraPermissionState.status.shouldShowRationale) {
+        "Para que o app funcione corretamente, precisamos acessar a sua câmera.\n\n" +
+                "Ela será usada para capturar imagens com números escritos à mão e reconhecer os caracteres usando nosso modelo de inteligência artificial."
+    } else {
+        "Olá! 👋\n\nEste app utiliza a câmera para identificar números escritos à mão com ajuda de um modelo de IA treinado por nós.\n\n" +
+                "Para começar, permita o acesso à câmera."
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 32.dp, vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.CameraAlt,
+            contentDescription = "Ícone de câmera",
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(72.dp)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = textToShow,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = { cameraPermissionState.launchPermissionRequest() },
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
         ) {
-            val textToShow = if (cameraPermissionState.status.shouldShowRationale) {
-                // If the user has denied the permission but the rationale can be shown,
-                // then gently explain why the app requires this permission
-                "Whoops! Looks like we need your camera to work our magic!" +
-                        "Don't worry, we just wanna see your pretty face (and maybe some cats).  " +
-                        "Grant us permission and let's get this party started!"
-            } else {
-                // If it's the first time the user lands on this feature, or the user
-                // doesn't want to be asked again for this permission, explain that the
-                // permission is required
-                "Hi there! We need your camera to work our magic! ✨\n" +
-                        "Grant us permission and let's get this party started! \uD83C\uDF89"
-            }
-            Text(textToShow, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(16.dp))
-            Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                Text("Unleash the Camera!")
-            }
+            Icon(
+                imageVector = Icons.Default.Videocam,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Text("Permitir acesso à câmera")
         }
     }
 }
@@ -118,7 +164,7 @@ fun CameraPreviewContent(
                 surfaceRequest = request,
                 modifier = modifier
             )
-            CameraMaskOverlay()
+            CameraMaskOverlay(maskSize = viewModel.maskSize)
             uiState.prediction?.let { prediction ->
                 Text(
                     modifier = modifier
@@ -133,11 +179,11 @@ fun CameraPreviewContent(
 }
 
 @Composable
-fun CameraMaskOverlay() {
+fun CameraMaskOverlay(maskSize: Float) {
     Canvas(modifier = Modifier.fillMaxSize()) {
         val overlayColor = Color.Black.copy(alpha = 0.6f)
 
-        val rectWidth = size.width * 0.4f
+        val rectWidth = size.width * maskSize
         //val rectHeight = size.height * 0.2f
         val rectHeight = rectWidth
 

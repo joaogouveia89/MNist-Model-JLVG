@@ -1,7 +1,9 @@
 package io.github.joaogouveia89.mnistmodelapp
 
 import android.content.Context
+import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
@@ -24,6 +26,8 @@ class MainViewModel : ViewModel() {
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
+
+    val maskSize = 0.4f
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
     private var previousHist: IntArray = intArrayOf()
@@ -56,29 +60,42 @@ class MainViewModel : ViewModel() {
     }
 
 
+    @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
-        val image = imageProxy.planes[0]
-        val buffer = image.buffer
-        val imgData = ByteArray(buffer.remaining())
-        buffer.get(imgData)
-        imageProxy.close()
+        val image = imageProxy.image ?: return
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val histogram = generateHistogramFromData(imgData)
-            val diff = histogramDifference(histogram, previousHist)
-            previousHist = histogram
-            if (diff < 10000) {
-                _uiState.update {
-                    it.copy(prediction = 5)
-                }
-            }else{
-                _uiState.update {
-                    it.copy(prediction = null)
-                }
-            }
+        val width = image.width
+        val height = image.height
+
+        val cropSize = (width * maskSize).toInt()
+        val cropLeft = (width - cropSize) / 2
+        val cropTop = (height - cropSize) / 2
+
+        val yBuffer = image.planes[0].buffer
+        val yRowStride = image.planes[0].rowStride
+        val croppedData = ByteArray(cropSize * cropSize)
+
+        for (y in 0 until cropSize) {
+            yBuffer.position((cropTop + y) * yRowStride + cropLeft)
+            yBuffer.get(croppedData, y * cropSize, cropSize)
         }
 
         imageProxy.close()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val histogram = generateHistogramFromData(croppedData)
+            val diff = histogramDifference(histogram, previousHist)
+            previousHist = histogram
+            _uiState.update {
+                if (diff < 10000){
+                    println(croppedData.map { b -> b.toInt() and 0xFF }.joinToString())
+                    it.copy(prediction =  5)
+                }else{
+                    it.copy(prediction =  null)
+                }
+
+            }
+        }
     }
 
     private fun histogramDifference(h1: IntArray, h2: IntArray): Int =
