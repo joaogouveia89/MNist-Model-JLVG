@@ -167,7 +167,10 @@ fun CameraPreviewContent(
                 surfaceRequest = request,
                 modifier = modifier
             )
-            CameraMaskOverlay(maskSize = viewModel.maskSize)
+            viewModel.maskSize?.let {
+                CameraMaskOverlay(maskSize = it)
+            }
+
             uiState.prediction?.let { prediction ->
                 Text(
                     modifier = modifier

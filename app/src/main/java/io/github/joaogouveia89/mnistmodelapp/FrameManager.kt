@@ -2,6 +2,8 @@ package io.github.joaogouveia89.mnistmodelapp
 
 import android.content.Context
 import android.util.Size
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
 import java.nio.ByteBuffer
@@ -17,7 +19,9 @@ class FrameManager(
     frameResolution: Size?
 ) {
     val maskSize = 0.4f
-    private var previousHist: IntArray = intArrayOf()
+
+    private val histMutex = Mutex()
+    @Volatile private var previousHist: IntArray = intArrayOf()
 
     private val cropSize = frameResolution?.width?.let { (it * maskSize).toInt() } ?: 0
     private val cropLeft = frameResolution?.width?.let { (it - (cropSize)) / 2 } ?: 0
@@ -40,9 +44,8 @@ class FrameManager(
 
         val histogram = generateHistogramFromData(croppedData)
         val diff = histogramDifference(histogram)
-        println("diff = $diff")
         previousHist = histogram
-        if (diff < 1000){
+        if (diff < 5000){
             println(preProcessedByteArray.joinToString())
             return 5
         }else{
@@ -73,6 +76,11 @@ class FrameManager(
         return histogram
     }
 
-    private fun histogramDifference(h1: IntArray): Int =
-        h1.zip(previousHist) { a, b -> abs(a - b) }.sum()
+    private suspend fun histogramDifference(h1: IntArray): Int {
+        return histMutex.withLock(owner = this) {
+            val diff = h1.zip(previousHist) { a, b -> abs(a - b) }.sum()
+            previousHist = h1
+            diff
+        }
+    }
 }

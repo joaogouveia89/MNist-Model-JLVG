@@ -19,17 +19,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-
+class MainViewModel(private val application: Application) : AndroidViewModel(application) {
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
-    private var previousHist: IntArray = intArrayOf()
 
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
         setSurfaceProvider { newSurfaceRequest ->
@@ -45,37 +43,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         .build()
         .apply { setAnalyzer(executor, ::analyzeImage) }
 
-    private val frameManager = FrameManager(
-        context = application.applicationContext,
-        frameResolution = imageAnalyzer.resolutionInfo?.resolution
-    )
+    private var frameManager: FrameManager? = null
 
-    val maskSize = frameManager.maskSize
-
-    private fun generateHistogramFromData(data: ByteArray, bins: Int = 64): IntArray {
-        val histogram = IntArray(bins)
-        val binSize = 256 / bins
-
-        for (value in data) {
-            val luminance = value.toInt() and 0xFF
-            val binIndex = luminance / binSize
-            histogram[binIndex]++
-        }
-
-        return histogram
-    }
+    val maskSize: Float?
+        get() = frameManager?.maskSize
 
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
         val image = imageProxy.image ?: return
 
-        val grayScaleImageBuffer = image.planes[0].buffer
+        var grayScaleImageBuffer = image.planes[0].buffer
         val grayScaleImageRowStride = image.planes[0].rowStride
+        val byteArray = ByteArray(grayScaleImageBuffer.remaining())
+        grayScaleImageBuffer.get(byteArray)
+
+        grayScaleImageBuffer = ByteBuffer.wrap(byteArray)
         imageProxy.close()
 
         viewModelScope.launch(Dispatchers.IO) {
-            val prediction = frameManager.predictFrame(grayScaleImageBuffer, grayScaleImageRowStride)
+            val prediction = frameManager?.predictFrame(grayScaleImageBuffer, grayScaleImageRowStride)
             _uiState.update {
                 it.copy(prediction = prediction)
             }
@@ -96,6 +83,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             DEFAULT_BACK_CAMERA,
             cameraPreviewUseCase,
             imageAnalyzer
+        )
+
+        frameManager = FrameManager(
+            context = application.applicationContext,
+            frameResolution = imageAnalyzer.resolutionInfo?.resolution
         )
         try {
             awaitCancellation()
