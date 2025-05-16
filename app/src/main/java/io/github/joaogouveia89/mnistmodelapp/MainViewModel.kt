@@ -1,5 +1,6 @@
 package io.github.joaogouveia89.mnistmodelapp
 
+import android.app.Application
 import android.content.Context
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
@@ -7,11 +8,10 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
-import androidx.camera.core.SurfaceRequest
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
@@ -20,14 +20,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
-import kotlin.math.abs
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
-
-    val maskSize = 0.4f
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
     private var previousHist: IntArray = intArrayOf()
@@ -45,6 +44,13 @@ class MainViewModel : ViewModel() {
         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .build()
         .apply { setAnalyzer(executor, ::analyzeImage) }
+
+    private val frameManager = FrameManager(
+        context = application.applicationContext,
+        frameResolution = imageAnalyzer.resolutionInfo?.resolution
+    )
+
+    val maskSize = frameManager.maskSize
 
     private fun generateHistogramFromData(data: ByteArray, bins: Int = 64): IntArray {
         val histogram = IntArray(bins)
@@ -64,42 +70,17 @@ class MainViewModel : ViewModel() {
     private fun analyzeImage(imageProxy: ImageProxy) {
         val image = imageProxy.image ?: return
 
-        val width = image.width
-        val height = image.height
-
-        val cropSize = (width * maskSize).toInt()
-        val cropLeft = (width - cropSize) / 2
-        val cropTop = (height - cropSize) / 2
-
-        val yBuffer = image.planes[0].buffer
-        val yRowStride = image.planes[0].rowStride
-        val croppedData = ByteArray(cropSize * cropSize)
-
-        for (y in 0 until cropSize) {
-            yBuffer.position((cropTop + y) * yRowStride + cropLeft)
-            yBuffer.get(croppedData, y * cropSize, cropSize)
-        }
-
+        val grayScaleImageBuffer = image.planes[0].buffer
+        val grayScaleImageRowStride = image.planes[0].rowStride
         imageProxy.close()
 
         viewModelScope.launch(Dispatchers.IO) {
-            val histogram = generateHistogramFromData(croppedData)
-            val diff = histogramDifference(histogram, previousHist)
-            previousHist = histogram
+            val prediction = frameManager.predictFrame(grayScaleImageBuffer, grayScaleImageRowStride)
             _uiState.update {
-                if (diff < 10000){
-                    println(croppedData.map { b -> b.toInt() and 0xFF }.joinToString())
-                    it.copy(prediction =  5)
-                }else{
-                    it.copy(prediction =  null)
-                }
-
+                it.copy(prediction = prediction)
             }
         }
     }
-
-    private fun histogramDifference(h1: IntArray, h2: IntArray): Int =
-        h1.zip(h2) { a, b -> abs(a - b) }.sum()
 
 
     suspend fun bindToCamera(appContext: Context, lifecycleOwner: LifecycleOwner) {
