@@ -46,21 +46,42 @@ class FrameManager(
         val diff = histogramDifference(histogram)
         previousHist = histogram
         if (diff < 5000){
-            println(preProcessedByteArray.joinToString())
-            return 5
+            val redimenImage = redimen(28, cropSize, preProcessedByteArray)
+
+            return evaluate(redimenImage)[0]
+                .withIndex()
+                .maxByOrNull { it.value }?.index
         }else{
             return null
         }
     }
 
-    private fun evaluate(imageBytes: ByteArray): Array<Array<FloatArray>>{
-        val outputArr = Array(1) {
-            Array(MODEL_IMAGE_WIDTH) {
-                FloatArray(MODEL_IMAGE_HEIGHT)
+    private fun redimen(goalDimen: Int, currentSize: Int, image: ByteArray): ByteArray {
+        val resized = ByteArray(goalDimen * goalDimen)
+
+        for (y in 0 until goalDimen) {
+            val srcY = y * currentSize / goalDimen
+            for (x in 0 until goalDimen) {
+                val srcX = x * currentSize / goalDimen
+                resized[y * goalDimen + x] = image[srcY * currentSize + srcX]
             }
         }
-        interpreter.run(imageBytes, outputArr)
-        return outputArr
+
+        return resized
+    }
+
+    private fun evaluate(imageBytes: ByteArray): Array<FloatArray>{
+        // Prepare input in FLOAT32 with normalization
+        val input = Array(1) {
+            FloatArray(MODEL_IMAGE_WIDTH * MODEL_IMAGE_HEIGHT) { i ->
+                (imageBytes[i].toInt() and 0xFF) / 255.0f
+            }
+        }
+
+        // Model output: a vector of 10 classes (0-9)
+        val output = Array(1) { FloatArray(10) }
+        interpreter.run(input, output)
+        return output
     }
 
     private fun generateHistogramFromData(data: ByteArray, bins: Int = 64): IntArray {
