@@ -4,6 +4,20 @@ This project is a practical blend of my Android development experience and machi
 
 The app captures grayscale camera frames, processes a central cropped region, resizes it to 28x28, and feeds it into a TensorFlow Lite model to predict the handwritten digit. It's designed to demonstrate how a classic deep learning model can be embedded into a real-time mobile application.
 
+## Model Architecture
+The model used in this project is a simple Sequential Neural Network built using TensorFlow 2.0. It is designed to classify handwritten digits from the MNIST dataset, which contains grayscale images of 28x28 pixels.
+
+## Architecture Details
+* Input Layer: Each 28x28 image is flattened into a 1D array of 784 elements.
+
+* Dense Layer 1: 50 neurons with ReLU activation.
+
+* Dense Layer 2: 50 neurons with ReLU activation.
+
+* Output Layer: 10 neurons with Softmax activation, representing the probability of each digit (0 through 9).
+
+The use of ReLU activation in the hidden layers enables the model to learn complex patterns, while the Softmax activation in the final layer ensures that the output values represent probabilities summing to 1.
+
 ## Features
 
 - Real-time camera input using CameraX
