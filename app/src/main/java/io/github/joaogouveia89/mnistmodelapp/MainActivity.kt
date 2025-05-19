@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
@@ -37,6 +35,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleOwner
@@ -100,13 +99,9 @@ fun CameraPermissionScreen(
     cameraPermissionState: PermissionState,
     modifier: Modifier = Modifier
 ) {
-    val textToShow = if (cameraPermissionState.status.shouldShowRationale) {
-        "Para que o app funcione corretamente, precisamos acessar a sua câmera.\n\n" +
-                "Ela será usada para capturar imagens com números escritos à mão e reconhecer os caracteres usando nosso modelo de inteligência artificial."
-    } else {
-        "Olá! 👋\n\nEste app utiliza a câmera para identificar números escritos à mão com ajuda de um modelo de IA treinado por nós.\n\n" +
-                "Para começar, permita o acesso à câmera."
-    }
+    val textToShow = if (cameraPermissionState.status.shouldShowRationale)
+        R.string.camera_permission_message_shouldShowRationale
+     else R.string.camera_permission_message_general
 
     Column(
         modifier = modifier
@@ -117,7 +112,7 @@ fun CameraPermissionScreen(
     ) {
         Icon(
             imageVector = Icons.Default.CameraAlt,
-            contentDescription = "Ícone de câmera",
+            contentDescription = "Camera icon",
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(72.dp)
         )
@@ -125,7 +120,7 @@ fun CameraPermissionScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = textToShow,
+            text = stringResource(textToShow),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge
         )
@@ -144,7 +139,7 @@ fun CameraPermissionScreen(
                 contentDescription = null,
                 modifier = Modifier.padding(end = 8.dp)
             )
-            Text("Permitir acesso à câmera")
+            Text(stringResource(R.string.allow_access_to_the_camera))
         }
     }
 }

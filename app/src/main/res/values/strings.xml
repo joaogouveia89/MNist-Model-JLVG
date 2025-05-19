@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">MNist Model App</string>
+    <string name="allow_access_to_the_camera">Allow access to the camera</string>
+    <string name="camera_permission_message_shouldShowRationale">For the app to work properly, we need access to your camera.\n\n It will be used to capture images of handwritten numbers and recognize the characters using our AI model.</string>
+    <string name="camera_permission_message_general">Hello! 👋\n\nThis app uses your camera to identify handwritten numbers using an AI model trained by us.\n\n To get started, please allow access to your camera.</string>
 </resources>
