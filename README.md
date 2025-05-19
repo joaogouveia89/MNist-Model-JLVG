@@ -18,6 +18,8 @@ The model used in this project is a simple Sequential Neural Network built using
 
 The use of ReLU activation in the hidden layers enables the model to learn complex patterns, while the Softmax activation in the final layer ensures that the output values represent probabilities summing to 1.
 
+![model_rep](screenshots/model-rep.png)
+
 ## Features
 
 - Real-time camera input using CameraX
