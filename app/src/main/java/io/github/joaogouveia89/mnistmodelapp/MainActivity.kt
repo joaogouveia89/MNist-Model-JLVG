@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewModel: MainViewModel by viewModels{
+        val viewModel: MainViewModel by viewModels {
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         }
 
@@ -101,7 +101,7 @@ fun CameraPermissionScreen(
 ) {
     val textToShow = if (cameraPermissionState.status.shouldShowRationale)
         R.string.camera_permission_message_shouldShowRationale
-     else R.string.camera_permission_message_general
+    else R.string.camera_permission_message_general
 
     Column(
         modifier = modifier
@@ -157,14 +157,12 @@ fun CameraPreviewContent(
     }
 
     uiState.surfaceRequest?.let { request ->
-        Box(modifier = Modifier.fillMaxSize()){
+        Box(modifier = Modifier.fillMaxSize()) {
             CameraXViewfinder(
                 surfaceRequest = request,
                 modifier = modifier
             )
-            viewModel.maskSize?.let {
-                CameraMaskOverlay(maskSize = it)
-            }
+            CameraMaskOverlay(maskSize = viewModel.maskSize)
 
             uiState.prediction?.let { prediction ->
                 Text(
@@ -185,13 +183,11 @@ fun CameraMaskOverlay(maskSize: Float) {
         val overlayColor = Color.Black.copy(alpha = 0.6f)
 
         val rectWidth = size.width * maskSize
-        //val rectHeight = size.height * 0.2f
-        val rectHeight = rectWidth
 
         val left = (size.width - rectWidth) / 2f
-        val top = (size.height - rectHeight) / 2f
+        val top = (size.height - rectWidth) / 2f
         val right = left + rectWidth
-        val bottom = top + rectHeight
+        val bottom = top + rectWidth
 
         val holeRect = Rect(left, top, right, bottom)
 

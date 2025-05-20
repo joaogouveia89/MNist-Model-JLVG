@@ -13,21 +13,22 @@ import androidx.camera.lifecycle.awaitInstance
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
+import io.github.joaogouveia89.mnistmodelapp.ktx.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
-class MainViewModel(private val application: Application) : AndroidViewModel(application) {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
+
 
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
         setSurfaceProvider { newSurfaceRequest ->
@@ -43,32 +44,27 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
         .build()
         .apply { setAnalyzer(executor, ::analyzeImage) }
 
-    private var frameManager: FrameManager? = null
+    private val frameManager = FrameManager(
+        context = application.applicationContext
+    )
 
-    val maskSize: Float?
-        get() = frameManager?.maskSize
+    val maskSize: Float
+        get() = frameManager.maskSize
 
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
         val image = imageProxy.image ?: return
-
-        var grayScaleImageBuffer = image.planes[0].buffer
-        val grayScaleImageRowStride = image.planes[0].rowStride
-        val byteArray = ByteArray(grayScaleImageBuffer.remaining())
-        grayScaleImageBuffer.get(byteArray)
-
-        grayScaleImageBuffer = ByteBuffer.wrap(byteArray)
+        val frame = image.toBitmap()
         imageProxy.close()
 
         viewModelScope.launch(Dispatchers.IO) {
-            val prediction = frameManager?.predictFrame(grayScaleImageBuffer, grayScaleImageRowStride)
+            val prediction = frameManager.predictFrame(frame)
             _uiState.update {
                 it.copy(prediction = prediction)
             }
         }
     }
-
 
     suspend fun bindToCamera(appContext: Context, lifecycleOwner: LifecycleOwner) {
         val processCameraProvider = ProcessCameraProvider.awaitInstance(appContext)
@@ -83,11 +79,6 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
             DEFAULT_BACK_CAMERA,
             cameraPreviewUseCase,
             imageAnalyzer
-        )
-
-        frameManager = FrameManager(
-            context = application.applicationContext,
-            frameResolution = imageAnalyzer.resolutionInfo?.resolution
         )
         try {
             awaitCancellation()
