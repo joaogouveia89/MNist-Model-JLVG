@@ -22,12 +22,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
+private const val PREDICTION_RATE = 500L
+
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
+
+    private var lastMeasureTime = 0L
 
 
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
@@ -54,16 +58,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
-        val image = imageProxy.image ?: return
-        val frame = image.toBitmap()
-        imageProxy.close()
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val prediction = frameManager.predictFrame(frame)
-            _uiState.update {
-                it.copy(prediction = prediction)
+        val currentTime = System.currentTimeMillis()
+        if(currentTime - lastMeasureTime >= PREDICTION_RATE){
+            lastMeasureTime = currentTime
+            val image = imageProxy.image ?: return
+            val frame = image.toBitmap()
+            viewModelScope.launch(Dispatchers.IO) {
+                val prediction = frameManager.predictFrame(frame)
+                _uiState.update {
+                    it.copy(prediction = prediction)
+                }
             }
         }
+        imageProxy.close()
     }
 
     suspend fun bindToCamera(appContext: Context, lifecycleOwner: LifecycleOwner) {

@@ -12,7 +12,6 @@ import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
 import kotlin.math.abs
 
-
 private const val TFLITE_MODEL_NAME = "mnist-jg.tflite"
 private const val MODEL_IMAGE_WIDTH = 28
 private const val MODEL_IMAGE_HEIGHT = 28
@@ -53,8 +52,8 @@ class FrameManager(
         val diff = histogramDifference(histogram)
         previousHist = histogram
         return if (diff < 5000) {
-            val scaledImage = cropped.scale(28, 28, true)
-            return evaluate(scaledImage.asByteArray())[0]
+            val input = preProcessCropped(cropped)
+            return evaluate(input)[0]
                 .withIndex()
                 .maxByOrNull { it.value }?.index
         } else {
@@ -62,13 +61,27 @@ class FrameManager(
         }
     }
 
-    private fun evaluate(imageBytes: ByteArray): Array<FloatArray> {
-        // Prepare input in FLOAT32 with normalization
+    private fun preProcessCropped(
+        cropped: Bitmap
+    ): Array<FloatArray> {
+        val scaledImage = cropped.scale(28, 28, true)
+        val imageBytes = scaledImage.asByteArray()
+        val handleBytes = imageBytes.map { (it.toInt() and 0xFF) }
+        val average = handleBytes.average()
+
         val input = Array(1) {
             FloatArray(MODEL_IMAGE_WIDTH * MODEL_IMAGE_HEIGHT) { i ->
-                (imageBytes[i].toInt() and 0xFF) / 255.0f
+                val candidate = handleBytes[i] / 255.0f
+                if (handleBytes[i] < average) {
+                    candidate
+                } else 0f
             }
         }
+        return input
+    }
+
+    private fun evaluate(input: Array<FloatArray>): Array<FloatArray> {
+        // Prepare input in FLOAT32 with normalization
 
         // Model output: a vector of 10 classes (0-9)
         val output = Array(1) { FloatArray(10) }
