@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -167,16 +168,23 @@ fun CameraPreviewContent(
             uiState.prediction?.let { prediction ->
                 Column(
                     modifier = modifier
-                        .background(Color.White)
+                        .background(prediction.color)
                         .padding(12.dp)
                         .align(Alignment.BottomCenter)
                 ) {
                     Text(
-                        text = "Prediction: ${prediction.first}",
+                        text = "Prediction: ${prediction.number}",
                     )
-                    Text(
-                        text = "Confidence: ${"%.2f".format(prediction.second)}",
-                    )
+                    Row {
+                        Text(
+                            text = "Confidence: ${prediction.confidence} %",
+                        )
+                        Icon(
+                            modifier = Modifier.padding(start = 8.dp),
+                            imageVector = prediction.icon,
+                            contentDescription = null
+                        )
+                    }
                 }
 
             }

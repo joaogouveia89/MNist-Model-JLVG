@@ -64,10 +64,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val image = imageProxy.image ?: return
             val frame = image.toBitmap()
             viewModelScope.launch(Dispatchers.IO) {
-                val prediction = frameManager.predictFrame(frame)
-                _uiState.update {
-                    it.copy(prediction = prediction)
+                frameManager.predictFrame(frame)?.also { prediction ->
+                    val confidence = (prediction.second * 100).toInt()
+                    _uiState.update {
+                        it.copy(prediction = CharacterPrediction(
+                            number = prediction.first,
+                            confidence = confidence
+                        ))
+                    }
                 }
+
             }
         }
         imageProxy.close()
