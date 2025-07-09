@@ -4,5 +4,5 @@ import androidx.camera.core.SurfaceRequest
 
 data class MNistCheckingUiState(
     val surfaceRequest: SurfaceRequest? = null,
-    val prediction: Int? = null
+    val prediction: Pair<Int, Float>? = null,
 )

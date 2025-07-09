@@ -29,7 +29,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
 
-    private var targetFps: Int = 25 // 25 FPS
+    private var targetFps: Int = 5 // 5 FPS
     private var predictionInterval: Long = 1000L / targetFps
 
     private var lastMeasureTime = 0L

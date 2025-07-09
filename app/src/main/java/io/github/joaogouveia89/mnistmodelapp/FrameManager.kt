@@ -32,7 +32,7 @@ class FrameManager(
     private val interpreter =
         Interpreter(FileUtil.loadMappedFile(context, TFLITE_MODEL_NAME), tfLiteOptions)
 
-    suspend fun predictFrame(frame: Bitmap): Int? {
+    suspend fun predictFrame(frame: Bitmap): Pair<Int, Float>? {
         val frameToAnalysis = frame.rotateBitmap(90f)
         if (cropMeasurements.isNotInitialized()) {
             val size = (frameToAnalysis.width * maskSize).toInt()
@@ -51,13 +51,14 @@ class FrameManager(
         val histogram = generateHistogramFromData(imageBytes)
         val diff = histogramDifference(histogram)
         previousHist = histogram
-        return if (diff < 5000) {
+        return diff.takeIf { it < 5000 }?.let {
             val input = preProcessCropped(cropped)
-            return evaluate(input)[0]
+            evaluate(input)[0]
                 .withIndex()
-                .maxByOrNull { it.value }?.index
-        } else {
-            null
+                .maxByOrNull { it.value }
+                ?.let { prediction ->
+                    Pair(prediction.index, prediction.value)
+                }
         }
     }
 

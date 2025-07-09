@@ -165,13 +165,20 @@ fun CameraPreviewContent(
             CameraMaskOverlay(maskSize = viewModel.maskSize)
 
             uiState.prediction?.let { prediction ->
-                Text(
+                Column(
                     modifier = modifier
                         .background(Color.White)
                         .padding(12.dp)
-                        .align(Alignment.BottomCenter),
-                    text = "Prediction: $prediction",
-                )
+                        .align(Alignment.BottomCenter)
+                ) {
+                    Text(
+                        text = "Prediction: ${prediction.first}",
+                    )
+                    Text(
+                        text = "Confidence: ${"%.2f".format(prediction.second)}",
+                    )
+                }
+
             }
         }
     }

@@ -45,7 +45,8 @@ The use of ReLU activation in the hidden layers enables the model to learn compl
 
 ## Planned Improvements
 
-- [x] Add FPS counter or inference time metrics
+- [x] ~~Add FPS counter or inference time metrics~~
+- [x] ~~Show the confidence of the prediction~~
 - [ ] Add option to toggle histogram difference filtering
 - [ ] Improve the histogram comparison with Chi-squared distance
 - [ ] Integrate confidence score in the UI
