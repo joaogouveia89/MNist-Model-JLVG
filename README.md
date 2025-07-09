@@ -45,15 +45,10 @@ The use of ReLU activation in the hidden layers enables the model to learn compl
 
 ## Planned Improvements
 
-- [ ] Add FPS counter or inference time metrics
-- [ ] Add support for drawing on the screen instead of using the camera
+- [x] Add FPS counter or inference time metrics
 - [ ] Add option to toggle histogram difference filtering
-- [ ] Use ML delegates (e.g., GPU delegate) for faster inference
 - [ ] Improve the histogram comparison with Chi-squared distance
-- [ ] Provide visual feedback on the detected region
-- [ ] Add UI toggle for mask size or crop area
 - [ ] Integrate confidence score in the UI
-- [ ] Replace raw array manipulation with bitmap/RenderScript processing for better performance and clarity
 - [ ] Improve modularization (e.g., inject `FrameManager` using DI like Hilt)
 - [ ] Write unit tests for core logic
 
