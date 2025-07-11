@@ -40,16 +40,15 @@ The use of ReLU activation in the hidden layers enables the model to learn compl
 
 ## Screenshots
 
-<!-- Replace with actual screenshots -->
-![pred1](screenshots/Screenshot_20250518-213916.png) ![pre2](screenshots/Screenshot_20250518-213957.png)
+![pred1](screenshots/Screenshot_20250711-151303.png)
 
 ## Planned Improvements
 
 - [x] ~~Add FPS counter or inference time metrics~~
 - [x] ~~Show the confidence of the prediction~~
 - [x] ~~Improve the ui of prediction show with percentage and icon~~
+- [x] ~~Update screenshots on readme~~
 - [ ] Add option to toggle histogram difference filtering
-- [ ] Update screenshots on readme
 - [ ] Improve the histogram comparison with Chi-squared distance
 - [ ] Integrate confidence score in the UI
 - [ ] Improve modularization (e.g., inject `FrameManager` using DI like Hilt)
