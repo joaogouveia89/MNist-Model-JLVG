@@ -10,7 +10,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.FileUtil
-import kotlin.math.abs
+import kotlin.math.pow
 
 private const val TFLITE_MODEL_NAME = "mnist-jg.tflite"
 private const val MODEL_IMAGE_WIDTH = 28
@@ -103,9 +103,15 @@ class FrameManager(
         return histogram
     }
 
-    private suspend fun histogramDifference(h1: IntArray): Int {
+    // Chi-squared difference
+    private suspend fun histogramDifference(h1: IntArray): Double {
         return histMutex.withLock(owner = this) {
-            val diff = h1.zip(previousHist) { a, b -> abs(a - b) }.sum()
+            val epsilon = 1e-10
+            val diff = h1.zip(previousHist) { a, b ->
+                val numerator = (a - b).toDouble().pow(2)
+                val denominator = a + b + epsilon
+                numerator / denominator
+            }.sum()
             previousHist = h1
             diff
         }

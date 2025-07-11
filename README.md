@@ -49,8 +49,8 @@ The use of ReLU activation in the hidden layers enables the model to learn compl
 - [x] ~~Improve the ui of prediction show with percentage and icon~~
 - [x] ~~Update screenshots on readme~~
 - [x] ~~Integrate confidence score in the UI~~
+- [x] ~~Improve the histogram comparison with Chi-squared distance~~
 - [ ] Add option to toggle histogram difference filtering
-- [ ] Improve the histogram comparison with Chi-squared distance
 - [ ] Improve modularization (e.g., inject `FrameManager` using DI like Hilt)
 - [ ] Write unit tests for core logic
 
