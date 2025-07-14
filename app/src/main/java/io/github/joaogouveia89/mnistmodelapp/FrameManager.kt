@@ -6,6 +6,7 @@ import androidx.core.graphics.scale
 import io.github.joaogouveia89.mnistmodelapp.ktx.asByteArray
 import io.github.joaogouveia89.mnistmodelapp.ktx.crop
 import io.github.joaogouveia89.mnistmodelapp.ktx.rotateBitmap
+import io.github.joaogouveia89.mnistmodelapp.ktx.toBlackBg
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.tensorflow.lite.Interpreter
@@ -69,7 +70,9 @@ class FrameManager(
     private fun preProcessCropped(
         cropped: Bitmap
     ): Array<FloatArray> {
-        val scaledImage = cropped.scale(28, 28, true)
+        val scaledImage = cropped
+            .scale(28, 28, true)
+            .toBlackBg(100)
         val imageBytes = scaledImage.asByteArray()
         val handleBytes = imageBytes.map { (it.toInt() and 0xFF) }
         val average = handleBytes.average()
