@@ -32,7 +32,7 @@ class FrameManager(
     private val interpreter =
         Interpreter(FileUtil.loadMappedFile(context, TFLITE_MODEL_NAME), tfLiteOptions)
 
-    suspend fun predictFrame(frame: Bitmap): Pair<Int, Float>? {
+    suspend fun predictFrame(frame: Bitmap): PredictionResult? {
         val frameToAnalysis = frame.rotateBitmap(90f)
         if (cropMeasurements.isNotInitialized()) {
             val size = (frameToAnalysis.width * maskSize).toInt()
@@ -57,7 +57,11 @@ class FrameManager(
                 .withIndex()
                 .maxByOrNull { it.value }
                 ?.let { prediction ->
-                    Pair(prediction.index, prediction.value)
+                    PredictionResult(
+                        predictedNumber = prediction.index,
+                        confidence = prediction.value,
+                        frame = cropped
+                    )
                 }
         }
     }
@@ -125,3 +129,9 @@ private data class CropMeasurements(
 ) {
     fun isNotInitialized() = size == 0 && top == 0 && left == 0
 }
+
+data class PredictionResult(
+    val predictedNumber: Int,
+    val confidence: Float,
+    val frame: Bitmap
+)

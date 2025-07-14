@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.camera.compose.CameraXViewfinder
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -172,19 +174,38 @@ fun CameraPreviewContent(
                         .padding(12.dp)
                         .align(Alignment.BottomCenter)
                 ) {
-                    Text(
-                        text = "Prediction: ${prediction.number}",
-                    )
-                    Row {
-                        Text(
-                            text = "Confidence: ${prediction.confidence} %",
-                        )
-                        Icon(
-                            modifier = Modifier.padding(start = 8.dp),
-                            imageVector = prediction.icon,
-                            contentDescription = null
-                        )
-                    }
+                   Row {
+                       prediction.frame?.let {
+                           Column(
+                               Modifier.background(Color.White),
+                               verticalArrangement = Arrangement.Center
+                           ) {
+                               Image(
+                                   bitmap = it.asImageBitmap(),
+                                   contentDescription = null,
+                               )
+                           }
+                       }
+
+                       Column(
+                           modifier = Modifier.padding(start = 8.dp),
+                           verticalArrangement = Arrangement.Center
+                       )  {
+                           Text(
+                               text = "Prediction: ${prediction.number}",
+                           )
+                           Row {
+                               Text(
+                                   text = "Confidence: ${prediction.confidence} %",
+                               )
+                               Icon(
+                                   modifier = Modifier.padding(start = 8.dp),
+                                   imageVector = prediction.icon,
+                                   contentDescription = null
+                               )
+                           }
+                       }
+                   }
                 }
 
             }

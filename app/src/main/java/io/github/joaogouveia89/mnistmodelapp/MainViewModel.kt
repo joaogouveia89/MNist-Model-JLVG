@@ -65,11 +65,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val frame = image.toBitmap()
             viewModelScope.launch(Dispatchers.IO) {
                 frameManager.predictFrame(frame)?.also { prediction ->
-                    val confidence = (prediction.second * 100).toInt()
+                    val confidence = (prediction.confidence * 100).toInt()
                     _uiState.update {
                         it.copy(prediction = CharacterPrediction(
-                            number = prediction.first,
-                            confidence = confidence
+                            number = prediction.predictedNumber,
+                            confidence = confidence,
+                            frame = prediction.frame
                         ))
                     }
                 }

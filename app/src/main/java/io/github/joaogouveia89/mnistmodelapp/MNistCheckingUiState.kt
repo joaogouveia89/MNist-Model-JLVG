@@ -1,5 +1,6 @@
 package io.github.joaogouveia89.mnistmodelapp
 
+import android.graphics.Bitmap
 import androidx.camera.core.SurfaceRequest
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Help
@@ -21,6 +22,7 @@ data class MNistCheckingUiState(
 data class CharacterPrediction(
     val number: Int,
     val confidence: Int,
+    val frame: Bitmap?
 ){
     val color: Color
         get() = when(confidence){
