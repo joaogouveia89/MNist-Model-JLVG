@@ -15,6 +15,7 @@ import kotlin.math.pow
 private const val TFLITE_MODEL_NAME = "mnist-jg.tflite"
 private const val MODEL_IMAGE_WIDTH = 28
 private const val MODEL_IMAGE_HEIGHT = 28
+private const val HISTOGRAM_DIFFERENCE_THRESHOLD = 5000
 
 // in a more complex application I would use a dependency injection framework to avoid use the application context here
 class FrameManager(
@@ -51,7 +52,7 @@ class FrameManager(
         val histogram = generateHistogramFromData(imageBytes)
         val diff = histogramDifference(histogram)
         previousHist = histogram
-        return diff.takeIf { it < 5000 }?.let {
+        return diff.takeIf { it < HISTOGRAM_DIFFERENCE_THRESHOLD }?.let {
             val input = preProcessCropped(cropped)
             evaluate(input)[0]
                 .withIndex()
