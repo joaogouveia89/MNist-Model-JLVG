@@ -42,25 +42,18 @@ The use of ReLU activation in the hidden layers enables the model to learn compl
 
 ![pred1](screenshots/Screenshot_20250711-151303.png)
 
-## Planned Improvements
-
-- [x] ~~Add FPS counter or inference time metrics~~
-- [x] ~~Show the confidence of the prediction~~
-- [x] ~~Improve the ui of prediction show with percentage and icon~~
-- [x] ~~Update screenshots on readme~~
-- [x] ~~Integrate confidence score in the UI~~
-- [x] ~~Improve the histogram comparison with Chi-squared distance~~
-- [x] ~~Add the bitmap preview on the left size of the prediction result~~
-- [ ] Add option to toggle histogram difference filtering
-- [ ] Improve modularization (e.g., inject `FrameManager` using DI like Hilt)
-- [ ] Write unit tests for core logic
-
 ## How to Run
 
 1. Clone the repository
 2. Open in Android Studio
 3. Build and run on a device (Camera is required)
 4. The model will predict digits from the central area of the frame in real time
+
+## Project Tags
+[proof-of-concept](https://github.com/joaogouveia89/MNist-Model-JLVG/releases/tag/proof-of-concept)
+> This initial version focuses primarily on validating the integration between Android’s CameraX API, image preprocessing, and TensorFlow Lite inference in real time.
+At this stage, development best practices and architectural patterns were considered but not the main priority — the main goal was to prove the feasibility of capturing a camera frame, performing simple manipulations, running it through a TensorFlow model, and displaying the prediction to the user.
+Future tags and releases will aim to refine the architecture, improve maintainability, and introduce cleaner abstractions while preserving the functional core established in this proof of concept.
 
 ## License
 
