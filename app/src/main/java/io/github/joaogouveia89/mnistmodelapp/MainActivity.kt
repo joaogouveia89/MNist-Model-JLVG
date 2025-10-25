@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -54,11 +55,14 @@ fun MainScreen(
     val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val lifeCycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(LocalLifecycleOwner.current) {
-        viewModel.bindToCamera(context.applicationContext, lifeCycleOwner)
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(Unit) {
+        val job = viewModel.bindToCamera(lifecycleOwner)
+        onDispose {
+            job.cancel()
+        }
     }
 
     if (cameraPermissionState.status.isGranted) {

@@ -24,7 +24,7 @@ fun ScanScreen(
 
             uiState.prediction?.let { prediction ->
                 PredictionResultBox(
-                    modifier = Modifier.align(Alignment.BottomCenter),
+                    modifier = modifier.align(Alignment.BottomCenter),
                     prediction = prediction
                 )
             }

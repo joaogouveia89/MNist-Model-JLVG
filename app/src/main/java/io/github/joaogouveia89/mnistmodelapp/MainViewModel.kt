@@ -1,7 +1,6 @@
 package io.github.joaogouveia89.mnistmodelapp
 
 import android.app.Application
-import android.content.Context
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ExperimentalGetImage
@@ -22,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel(private val application: Application) : AndroidViewModel(application) {
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
@@ -80,24 +79,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         imageProxy.close()
     }
 
-    suspend fun bindToCamera(appContext: Context, lifecycleOwner: LifecycleOwner) {
-        val processCameraProvider = ProcessCameraProvider.awaitInstance(appContext)
+    fun bindToCamera(lifecycleOwner: LifecycleOwner)=
+        viewModelScope.launch {
+            val processCameraProvider = ProcessCameraProvider.awaitInstance(application.applicationContext)
 
-        processCameraProvider.bindToLifecycle(
-            lifecycleOwner, DEFAULT_BACK_CAMERA, cameraPreviewUseCase
-        )
-
-        processCameraProvider.unbindAll()
-        processCameraProvider.bindToLifecycle(
-            lifecycleOwner,
-            DEFAULT_BACK_CAMERA,
-            cameraPreviewUseCase,
-            imageAnalyzer
-        )
-        try {
-            awaitCancellation()
-        } finally {
             processCameraProvider.unbindAll()
+            processCameraProvider.bindToLifecycle(
+                lifecycleOwner,
+                DEFAULT_BACK_CAMERA,
+                cameraPreviewUseCase,
+                imageAnalyzer
+            )
+
+            try {
+                awaitCancellation()
+            } finally {
+                processCameraProvider.unbindAll()
+            }
         }
-    }
 }
