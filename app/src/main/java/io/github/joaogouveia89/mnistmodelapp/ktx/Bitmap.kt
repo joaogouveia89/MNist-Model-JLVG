@@ -1,11 +1,7 @@
 package io.github.joaogouveia89.mnistmodelapp.ktx
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
-import android.graphics.Paint
 import java.nio.ByteBuffer
 
 
