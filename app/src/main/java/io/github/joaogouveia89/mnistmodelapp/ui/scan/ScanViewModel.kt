@@ -27,7 +27,6 @@ import java.util.concurrent.Executors
 
 private const val TARGET_FPS: Int = 5 // 5 FPS
 
-@HiltViewModel
 class ScanViewModel(private val application: Application) : AndroidViewModel(application) {
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>

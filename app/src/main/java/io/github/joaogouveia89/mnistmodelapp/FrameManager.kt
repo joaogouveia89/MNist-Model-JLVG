@@ -9,7 +9,9 @@ import io.github.joaogouveia89.mnistmodelapp.ktx.rotateBitmap
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.support.common.FileUtil
+import java.io.FileInputStream
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
 import kotlin.math.pow
 
 private const val TFLITE_MODEL_NAME = "mnist-jg.tflite"
@@ -30,8 +32,10 @@ class FrameManager(
     private var cropMeasurements: CropMeasurements = CropMeasurements()
 
     private val tfLiteOptions = Interpreter.Options()//can be configure to use GPUDelegate
+
     private val interpreter =
-        Interpreter(FileUtil.loadMappedFile(context, TFLITE_MODEL_NAME), tfLiteOptions)
+        Interpreter(loadModelFile(context, TFLITE_MODEL_NAME), tfLiteOptions)
+
 
     suspend fun predictFrame(frame: Bitmap): PredictionResult? {
         val frameToAnalysis = frame.rotateBitmap(90f)
@@ -121,6 +125,15 @@ class FrameManager(
             previousHist = h1
             diff
         }
+    }
+
+    private fun loadModelFile(context: Context, modelName: String): MappedByteBuffer {
+        val fileDescriptor = context.assets.openFd(modelName)
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 }
 

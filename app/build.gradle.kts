@@ -29,6 +29,16 @@ android {
             )
         }
     }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -38,6 +48,10 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    androidResources {
+        noCompress += "tflite"
     }
 }
 
@@ -59,7 +73,6 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.tensorflow.lite)
-    implementation(libs.tensorflow.lite.task.vision)
     implementation(libs.tensorflow.lite.gpu)
     implementation(libs.hilt.impl)
 
