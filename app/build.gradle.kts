@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "io.github.joaogouveia89.mnistmodelapp"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "io.github.joaogouveia89.mnistmodelapp"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
