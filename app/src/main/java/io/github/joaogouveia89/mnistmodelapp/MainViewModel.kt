@@ -21,15 +21,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
+private const val TARGET_FPS: Int = 5 // 5 FPS
+
 class MainViewModel(private val application: Application) : AndroidViewModel(application) {
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
-
-    private var targetFps: Int = 5 // 5 FPS
-    private var predictionInterval: Long = 1000L / targetFps
+    private val predictionInterval: Long = 1000L / TARGET_FPS
 
     private var lastMeasureTime = 0L
 
