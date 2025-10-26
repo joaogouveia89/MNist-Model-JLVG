@@ -1,33 +1,48 @@
 package io.github.joaogouveia89.mnistmodelapp.ui.scan
 
-import androidx.camera.compose.CameraXViewfinder
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import io.github.joaogouveia89.mnistmodelapp.MNistCheckingUiState
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import io.github.joaogouveia89.mnistmodelapp.ui.cameraPermission.CameraPermissionScreen
+import kotlin.getValue
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ScanScreen(
     modifier: Modifier = Modifier,
-    uiState: MNistCheckingUiState,
-    maskSize: Float
+    viewModel: ScanViewModel
 ) {
-    uiState.surfaceRequest?.let { request ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            CameraXViewfinder(
-                surfaceRequest = request,
-                modifier = modifier
-            )
-            CameraMaskOverlay(maskSize = maskSize)
+    val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
 
-            uiState.prediction?.let { prediction ->
-                PredictionResultBox(
-                    modifier = modifier.align(Alignment.BottomCenter),
-                    prediction = prediction
-                )
-            }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(Unit) {
+        val job = viewModel.bindToCamera(lifecycleOwner)
+        onDispose {
+            job.cancel()
         }
+    }
+
+    if (cameraPermissionState.status.isGranted) {
+        ScanContainer(
+            modifier = modifier,
+            uiState = uiState,
+            maskSize = viewModel.maskSize
+        )
+    } else {
+        CameraPermissionScreen(
+            modifier = modifier,
+            cameraPermissionState = cameraPermissionState
+        )
     }
 }

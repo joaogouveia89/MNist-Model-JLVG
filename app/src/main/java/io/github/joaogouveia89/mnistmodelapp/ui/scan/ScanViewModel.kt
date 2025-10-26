@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp
+package io.github.joaogouveia89.mnistmodelapp.ui.scan
 
 import android.app.Application
 import androidx.annotation.OptIn
@@ -12,6 +12,10 @@ import androidx.camera.lifecycle.awaitInstance
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.joaogouveia89.mnistmodelapp.CharacterPrediction
+import io.github.joaogouveia89.mnistmodelapp.FrameManager
+import io.github.joaogouveia89.mnistmodelapp.MNistCheckingUiState
 import io.github.joaogouveia89.mnistmodelapp.ktx.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
@@ -23,7 +27,8 @@ import java.util.concurrent.Executors
 
 private const val TARGET_FPS: Int = 5 // 5 FPS
 
-class MainViewModel(private val application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ScanViewModel(private val application: Application) : AndroidViewModel(application) {
     // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
@@ -70,7 +75,8 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
                             number = prediction.predictedNumber,
                             confidence = confidence,
                             frame = prediction.frame
-                        ))
+                        )
+                        )
                     }
                 }
 
