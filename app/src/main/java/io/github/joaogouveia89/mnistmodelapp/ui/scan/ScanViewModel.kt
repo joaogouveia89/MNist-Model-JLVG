@@ -12,7 +12,6 @@ import androidx.camera.lifecycle.awaitInstance
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.joaogouveia89.mnistmodelapp.CharacterPrediction
 import io.github.joaogouveia89.mnistmodelapp.FrameManager
 import io.github.joaogouveia89.mnistmodelapp.MNistCheckingUiState
@@ -62,7 +61,7 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
         val currentTime = System.currentTimeMillis()
-        if(currentTime - lastMeasureTime >= predictionInterval){
+        if (currentTime - lastMeasureTime >= predictionInterval) {
             lastMeasureTime = currentTime
             val image = imageProxy.image ?: return
             val frame = image.toBitmap()
@@ -70,11 +69,12 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
                 frameManager.predictFrame(frame)?.also { prediction ->
                     val confidence = (prediction.confidence * 100).toInt()
                     _uiState.update {
-                        it.copy(prediction = CharacterPrediction(
-                            number = prediction.predictedNumber,
-                            confidence = confidence,
-                            frame = prediction.frame
-                        )
+                        it.copy(
+                            prediction = CharacterPrediction(
+                                number = prediction.predictedNumber,
+                                confidence = confidence,
+                                frame = prediction.frame
+                            )
                         )
                     }
                 }
@@ -84,9 +84,10 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
         imageProxy.close()
     }
 
-    fun bindToCamera(lifecycleOwner: LifecycleOwner)=
+    fun bindToCamera(lifecycleOwner: LifecycleOwner) =
         viewModelScope.launch {
-            val processCameraProvider = ProcessCameraProvider.awaitInstance(application.applicationContext)
+            val processCameraProvider =
+                ProcessCameraProvider.awaitInstance(application.applicationContext)
 
             processCameraProvider.unbindAll()
             processCameraProvider.bindToLifecycle(

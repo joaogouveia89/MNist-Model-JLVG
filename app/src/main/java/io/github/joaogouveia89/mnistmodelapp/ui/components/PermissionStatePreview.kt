@@ -9,5 +9,6 @@ class PermissionStatePreview(
     override val permission: String,
     override val status: PermissionStatus
 ) : PermissionState {
-    override fun launchPermissionRequest() { /* NO-OP */ }
+    override fun launchPermissionRequest() { /* NO-OP */
+    }
 }

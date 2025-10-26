@@ -26,6 +26,7 @@ class FrameManager(
     val maskSize = 0.4f
 
     private val histMutex = Mutex()
+
     @Volatile
     private var previousHist: IntArray = intArrayOf()
 

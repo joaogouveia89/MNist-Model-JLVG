@@ -23,9 +23,9 @@ data class CharacterPrediction(
     val number: Int,
     val confidence: Int,
     val frame: Bitmap?
-){
+) {
     val color: Color
-        get() = when(confidence){
+        get() = when (confidence) {
             in 0..50 -> RedAlert
             in 50..69 -> Orange
             in 70..89 -> Yellow
@@ -33,7 +33,7 @@ data class CharacterPrediction(
             else -> Color.Green
         }
     val icon: ImageVector
-        get() = when(confidence){
+        get() = when (confidence) {
             in 0..30 -> Icons.Outlined.ReportProblem
             in 30..50 -> Icons.AutoMirrored.Outlined.HelpOutline
             in 50..70 -> Icons.AutoMirrored.Outlined.Help

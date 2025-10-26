@@ -1,18 +1,15 @@
 package io.github.joaogouveia89.mnistmodelapp.ui.scan
 
-import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import io.github.joaogouveia89.mnistmodelapp.ui.cameraPermission.CameraPermissionScreen
-import kotlin.getValue
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
