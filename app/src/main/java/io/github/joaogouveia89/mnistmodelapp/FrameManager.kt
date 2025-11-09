@@ -9,6 +9,9 @@ import io.github.joaogouveia89.mnistmodelapp.ktx.rotateBitmap
  * Coordinates camera frame processing
  * Orchestrates ImagePreprocessor, HistogramAnalyzer, and MnistModel
  */
+
+private const val TARGET_FPS: Int = 5 // 5 FPS
+
 class FrameManager(
     context: Context,
     val maskSize: Float = 0.4f
@@ -17,9 +20,19 @@ class FrameManager(
     private val histogramAnalyzer = HistogramAnalyzer()
     private val mnistModel = MnistModel(context)
 
+    private val minIntervalMs: Long = 1000L / TARGET_FPS
+    private var lastPredictionTime = 0L
+
     private var cropMeasurements: CropMeasurements = CropMeasurements()
 
     suspend fun predictFrame(frame: Bitmap): PredictionResult? {
+
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastPredictionTime < minIntervalMs) {
+            return null
+        }
+
+        lastPredictionTime = currentTime
 
         val frameToAnalysis = frame.rotateBitmap(90f)
 

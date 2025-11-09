@@ -24,15 +24,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
-private const val TARGET_FPS: Int = 5 // 5 FPS
-
 class ScanViewModel(private val application: Application) : AndroidViewModel(application) {
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
-    private val predictionInterval: Long = 1000L / TARGET_FPS
-    private var lastMeasureTime = 0L
 
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
         setSurfaceProvider { newSurfaceRequest ->
@@ -58,26 +54,23 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastMeasureTime >= predictionInterval) {
-            lastMeasureTime = currentTime
-            val image = imageProxy.image ?: return
-            val frame = image.toBitmap()
-            viewModelScope.launch(Dispatchers.IO) {
-                frameManager.predictFrame(frame)?.also { prediction ->
-                    val confidence = (prediction.confidence * 100).toInt()
-                    _uiState.update {
-                        it.copy(
-                            prediction = CharacterPrediction(
-                                number = prediction.predictedNumber,
-                                confidence = confidence,
-                                frame = prediction.frame
-                            )
+        val image = imageProxy.image ?: return
+        val frame = image.toBitmap()
+        viewModelScope.launch(Dispatchers.IO) {
+            frameManager.predictFrame(frame)?.also { prediction ->
+                val confidence = (prediction.confidence * 100).toInt()
+                _uiState.update {
+                    it.copy(
+                        prediction = CharacterPrediction(
+                            number = prediction.predictedNumber,
+                            confidence = confidence,
+                            frame = prediction.frame
                         )
-                    }
+                    )
                 }
             }
         }
+
         imageProxy.close()
     }
 
