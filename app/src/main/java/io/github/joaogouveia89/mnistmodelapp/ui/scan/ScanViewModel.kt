@@ -27,13 +27,11 @@ import java.util.concurrent.Executors
 private const val TARGET_FPS: Int = 5 // 5 FPS
 
 class ScanViewModel(private val application: Application) : AndroidViewModel(application) {
-    // Used to set up a link between the Camera and your UI.
     val uiState: StateFlow<MNistCheckingUiState>
         get() = _uiState
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
     private val predictionInterval: Long = 1000L / TARGET_FPS
-
     private var lastMeasureTime = 0L
 
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
@@ -43,6 +41,7 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
             }
         }
     }
+
     private val executor = Executors.newSingleThreadExecutor()
 
     private val imageAnalyzer = ImageAnalysis.Builder()
@@ -56,7 +55,6 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
 
     val maskSize: Float
         get() = frameManager.maskSize
-
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
@@ -78,7 +76,6 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
                         )
                     }
                 }
-
             }
         }
         imageProxy.close()
@@ -103,4 +100,13 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
                 processCameraProvider.unbindAll()
             }
         }
+
+    /**
+     * Releases TensorFlow Lite and executor resources
+     */
+    override fun onCleared() {
+        super.onCleared()
+        frameManager.release()
+        executor.shutdown()
+    }
 }
