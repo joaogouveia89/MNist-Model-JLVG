@@ -2,6 +2,7 @@ package io.github.joaogouveia89.mnistmodelapp.ui.scan
 
 import android.app.Application
 import androidx.annotation.OptIn
+import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -20,30 +21,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
-class ScanViewModel(private val application: Application) : AndroidViewModel(application) {
-    val uiState: StateFlow<MNistCheckingUiState>
-        get() = _uiState
+class ScanViewModel(
+    private val application: Application
+) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
+    val uiState: StateFlow<MNistCheckingUiState> = _uiState.asStateFlow()
 
-    private val cameraPreviewUseCase = Preview.Builder().build().apply {
-        setSurfaceProvider { newSurfaceRequest ->
-            _uiState.update {
-                it.copy(surfaceRequest = newSurfaceRequest)
-            }
-        }
-    }
-
+    // Executor for image analysis (dedicated single thread)
     private val executor = Executors.newSingleThreadExecutor()
 
-    private val imageAnalyzer = ImageAnalysis.Builder()
-        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-        .build()
-        .apply { setAnalyzer(executor, ::analyzeImage) }
+    val cameraSelector: CameraSelector = DEFAULT_BACK_CAMERA
 
     private val frameManager = FrameManager(
         context = application.applicationContext
@@ -52,51 +45,61 @@ class ScanViewModel(private val application: Application) : AndroidViewModel(app
     val maskSize: Float
         get() = frameManager.maskSize
 
-    @OptIn(ExperimentalGetImage::class)
-    private fun analyzeImage(imageProxy: ImageProxy) {
-        val image = imageProxy.image ?: return
-        val frame = image.toBitmap()
-        viewModelScope.launch(Dispatchers.IO) {
-            frameManager.predictFrame(frame)?.also { prediction ->
-                val confidence = (prediction.confidence * 100).toInt()
-                _uiState.update {
-                    it.copy(
-                        prediction = CharacterPrediction(
-                            number = prediction.predictedNumber,
-                            confidence = confidence,
-                            frame = prediction.frame
-                        )
-                    )
+
+    val cameraPreviewUseCase: Preview = Preview.Builder()
+        .build()
+        .apply {
+            setSurfaceProvider { newSurfaceRequest ->
+                _uiState.update { currentState ->
+                    currentState.copy(surfaceRequest = newSurfaceRequest)
                 }
             }
         }
 
-        imageProxy.close()
-    }
-
-    fun bindToCamera(lifecycleOwner: LifecycleOwner) =
-        viewModelScope.launch {
-            val processCameraProvider =
-                ProcessCameraProvider.awaitInstance(application.applicationContext)
-
-            processCameraProvider.unbindAll()
-            processCameraProvider.bindToLifecycle(
-                lifecycleOwner,
-                DEFAULT_BACK_CAMERA,
-                cameraPreviewUseCase,
-                imageAnalyzer
-            )
-
-            try {
-                awaitCancellation()
-            } finally {
-                processCameraProvider.unbindAll()
-            }
+    val imageAnalyzer: ImageAnalysis = ImageAnalysis.Builder()
+        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+        .build()
+        .apply {
+            setAnalyzer(executor, ::analyzeImage)
         }
 
-    /**
-     * Releases TensorFlow Lite and executor resources
-     */
+    @OptIn(ExperimentalGetImage::class)
+    private fun analyzeImage(imageProxy: ImageProxy) {
+        try {
+            val image = imageProxy.image
+            if (image == null) {
+                imageProxy.close()
+                return
+            }
+
+            val frame = image.toBitmap()
+
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    frameManager.predictFrame(frame)?.let { prediction ->
+                        val confidencePercentage = (prediction.confidence * 100).toInt()
+
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                prediction = CharacterPrediction(
+                                    number = prediction.predictedNumber,
+                                    confidence = confidencePercentage,
+                                    frame = prediction.frame
+                                )
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    // Log the error silently - we don't want to crash due to a single problematic frame
+                    // In production, add appropriate logging (Firebase Crashlytics, etc.)
+                }
+            }
+        } finally {
+
+            imageProxy.close()
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         frameManager.release()

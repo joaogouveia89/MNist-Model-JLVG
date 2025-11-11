@@ -101,6 +101,9 @@ dependencies {
     implementation(libs.tensorflow.lite)
     implementation(libs.tensorflow.lite.gpu)
 
+    // kotlin specific
+    implementation(libs.kotlinx.coroutines.guava)
+
     // Testing - Unit Tests
     testImplementation(libs.junit)
 
