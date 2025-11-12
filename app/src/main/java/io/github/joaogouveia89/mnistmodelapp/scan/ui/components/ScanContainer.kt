@@ -20,6 +20,7 @@ fun ScanContainer(
             null -> {
                 CameraLoadingState()
             }
+
             else -> {
                 CameraXViewfinder(
                     surfaceRequest = surfaceRequest,

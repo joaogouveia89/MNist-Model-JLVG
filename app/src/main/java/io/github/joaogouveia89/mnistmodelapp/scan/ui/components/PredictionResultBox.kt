@@ -18,8 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.joaogouveia89.mnistmodelapp.R
-import io.github.joaogouveia89.mnistmodelapp.helpers.BitmapUtils
 import io.github.joaogouveia89.mnistmodelapp.core.ui.theme.MNistModelAppTheme
+import io.github.joaogouveia89.mnistmodelapp.helpers.BitmapUtils
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.CharacterPrediction
 
 @Composable

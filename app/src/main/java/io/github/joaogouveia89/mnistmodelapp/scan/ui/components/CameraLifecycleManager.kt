@@ -1,4 +1,5 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.ui.components
+
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
