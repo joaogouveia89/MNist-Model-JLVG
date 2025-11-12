@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp.ui.scan
+package io.github.joaogouveia89.mnistmodelapp.scan.ui.components
 
 import androidx.camera.compose.CameraXViewfinder
 import androidx.compose.foundation.layout.Box
@@ -7,7 +7,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.joaogouveia89.mnistmodelapp.MNistCheckingUiState
+import io.github.joaogouveia89.mnistmodelapp.scan.ui.MNistCheckingUiState
 
 @Composable
 fun ScanContainer(

@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp.ui.components
+package io.github.joaogouveia89.mnistmodelapp.core.ui.preview
 
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState

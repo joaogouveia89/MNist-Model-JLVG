@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
-import io.github.joaogouveia89.mnistmodelapp.ui.scan.ScanScreen
-import io.github.joaogouveia89.mnistmodelapp.ui.scan.ScanViewModel
-import io.github.joaogouveia89.mnistmodelapp.ui.theme.MNistModelAppTheme
+import io.github.joaogouveia89.mnistmodelapp.scan.ui.ScanScreen
+import io.github.joaogouveia89.mnistmodelapp.scan.ui.ScanViewModel
+import io.github.joaogouveia89.mnistmodelapp.core.ui.theme.MNistModelAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

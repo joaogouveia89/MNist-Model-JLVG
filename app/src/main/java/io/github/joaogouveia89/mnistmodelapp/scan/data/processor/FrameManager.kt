@@ -1,9 +1,11 @@
-package io.github.joaogouveia89.mnistmodelapp
+package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 
 import android.content.Context
 import android.graphics.Bitmap
 import io.github.joaogouveia89.mnistmodelapp.ktx.asByteArray
 import io.github.joaogouveia89.mnistmodelapp.ktx.rotateBitmap
+import io.github.joaogouveia89.mnistmodelapp.scan.data.ml.MnistModel
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.PredictionResult
 
 /**
  * Coordinates camera frame processing
@@ -74,9 +76,3 @@ class FrameManager(
         mnistModel.close()
     }
 }
-
-data class PredictionResult(
-    val predictedNumber: Int,
-    val confidence: Float,
-    val frame: Bitmap
-)

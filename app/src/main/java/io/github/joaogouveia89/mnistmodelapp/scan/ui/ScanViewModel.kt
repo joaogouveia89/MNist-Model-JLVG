@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp.ui.scan
+package io.github.joaogouveia89.mnistmodelapp.scan.ui
 
 import android.app.Application
 import androidx.annotation.OptIn
@@ -8,17 +8,12 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.lifecycle.awaitInstance
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
-import io.github.joaogouveia89.mnistmodelapp.CharacterPrediction
-import io.github.joaogouveia89.mnistmodelapp.FrameManager
-import io.github.joaogouveia89.mnistmodelapp.MNistCheckingUiState
 import io.github.joaogouveia89.mnistmodelapp.ktx.toBitmap
+import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameManager
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.CharacterPrediction
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp.ui.scan
+package io.github.joaogouveia89.mnistmodelapp.scan.ui.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize

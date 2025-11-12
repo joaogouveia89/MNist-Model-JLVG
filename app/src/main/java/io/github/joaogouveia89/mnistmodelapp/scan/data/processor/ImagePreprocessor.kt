@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp
+package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 
 import android.graphics.Bitmap
 import androidx.core.graphics.scale

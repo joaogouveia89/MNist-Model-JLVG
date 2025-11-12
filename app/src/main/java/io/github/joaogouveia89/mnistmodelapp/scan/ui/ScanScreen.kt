@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp.ui.scan
+package io.github.joaogouveia89.mnistmodelapp.scan.ui
 
 import android.Manifest
 import androidx.camera.core.CameraSelector
@@ -6,16 +6,15 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import io.github.joaogouveia89.mnistmodelapp.MNistCheckingUiState
-import io.github.joaogouveia89.mnistmodelapp.ui.cameraPermission.CameraPermissionScreen
+import io.github.joaogouveia89.mnistmodelapp.core.ui.components.CameraPermissionScreen
+import io.github.joaogouveia89.mnistmodelapp.scan.ui.components.CameraLifecycleManager
+import io.github.joaogouveia89.mnistmodelapp.scan.ui.components.ScanContainer
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

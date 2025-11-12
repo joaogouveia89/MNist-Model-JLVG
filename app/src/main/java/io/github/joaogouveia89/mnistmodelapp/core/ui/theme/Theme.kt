@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp.ui.theme
+package io.github.joaogouveia89.mnistmodelapp.core.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

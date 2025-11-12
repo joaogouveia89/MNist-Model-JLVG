@@ -1,7 +1,6 @@
-package io.github.joaogouveia89.mnistmodelapp
+package io.github.joaogouveia89.mnistmodelapp.scan.domain
 
 import android.graphics.Bitmap
-import androidx.camera.core.SurfaceRequest
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
@@ -9,15 +8,10 @@ import androidx.compose.material.icons.outlined.CheckCircleOutline
 import androidx.compose.material.icons.outlined.ReportProblem
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import io.github.joaogouveia89.mnistmodelapp.ui.theme.Orange
-import io.github.joaogouveia89.mnistmodelapp.ui.theme.RedAlert
-import io.github.joaogouveia89.mnistmodelapp.ui.theme.SuccessGreen
-import io.github.joaogouveia89.mnistmodelapp.ui.theme.Yellow
-
-data class MNistCheckingUiState(
-    val surfaceRequest: SurfaceRequest? = null,
-    val prediction: CharacterPrediction? = null,
-)
+import io.github.joaogouveia89.mnistmodelapp.core.ui.theme.Orange
+import io.github.joaogouveia89.mnistmodelapp.core.ui.theme.RedAlert
+import io.github.joaogouveia89.mnistmodelapp.core.ui.theme.SuccessGreen
+import io.github.joaogouveia89.mnistmodelapp.core.ui.theme.Yellow
 
 data class CharacterPrediction(
     val number: Int,

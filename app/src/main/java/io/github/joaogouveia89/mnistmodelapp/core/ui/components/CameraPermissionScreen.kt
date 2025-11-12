@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp.ui.cameraPermission
+package io.github.joaogouveia89.mnistmodelapp.core.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,9 +27,9 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.shouldShowRationale
 import io.github.joaogouveia89.mnistmodelapp.R
-import io.github.joaogouveia89.mnistmodelapp.ui.components.PermissionStatePreview
-import io.github.joaogouveia89.mnistmodelapp.ui.theme.Dimens
-import io.github.joaogouveia89.mnistmodelapp.ui.theme.MNistModelAppTheme
+import io.github.joaogouveia89.mnistmodelapp.core.ui.preview.PermissionStatePreview
+import io.github.joaogouveia89.mnistmodelapp.core.ui.theme.Dimens
+import io.github.joaogouveia89.mnistmodelapp.core.ui.theme.MNistModelAppTheme
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

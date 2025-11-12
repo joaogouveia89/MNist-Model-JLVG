@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp
+package io.github.joaogouveia89.mnistmodelapp.scan.data.ml
 
 import android.content.Context
 import org.tensorflow.lite.Interpreter

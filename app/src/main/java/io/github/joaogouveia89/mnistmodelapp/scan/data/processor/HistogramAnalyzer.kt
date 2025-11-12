@@ -1,4 +1,4 @@
-package io.github.joaogouveia89.mnistmodelapp
+package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
