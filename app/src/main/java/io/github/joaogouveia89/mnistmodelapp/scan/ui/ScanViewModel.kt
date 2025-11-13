@@ -126,14 +126,18 @@ class ScanViewModel(
         height: Int,
     ): Bitmap {
         val bitmap = createBitmap(width, height, Bitmap.Config.ALPHA_8)
-        val dest = ByteArray(width * height)
 
+        if (pixelStride == 1 && rowStride == width) {
+            bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(yData))
+            return bitmap
+        }
+
+        val dest = ByteArray(width * height)
         var pos = 0
         for (row in 0 until height) {
             val rowStart = row * rowStride
             for (col in 0 until width) {
-                val index = rowStart + col * pixelStride
-                dest[pos++] = yData[index]
+                dest[pos++] = yData[rowStart + col * pixelStride]
             }
         }
 
