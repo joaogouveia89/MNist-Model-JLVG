@@ -68,8 +68,7 @@ class ScanViewModel(
             }
 
             val frame = image.toBitmap()
-
-            viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.Default) {
                 try {
                     frameManager.predictFrame(frame)?.let { prediction ->
                         val confidencePercentage = (prediction.confidence * 100).toInt()
@@ -90,7 +89,6 @@ class ScanViewModel(
                 }
             }
         } finally {
-
             imageProxy.close()
         }
     }

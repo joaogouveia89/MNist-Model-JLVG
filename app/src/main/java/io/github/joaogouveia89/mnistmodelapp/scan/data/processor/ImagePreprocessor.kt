@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import androidx.core.graphics.scale
 import io.github.joaogouveia89.mnistmodelapp.ktx.asByteArray
 import io.github.joaogouveia89.mnistmodelapp.ktx.crop
+import io.github.joaogouveia89.mnistmodelapp.scan.data.model.CropMeasurements
 
 /*
  * Prepare images for model analysis.
@@ -55,12 +56,4 @@ class ImagePreprocessor {
             top = (frameHeight - size) / 2
         )
     }
-}
-
-data class CropMeasurements(
-    val size: Int = 0,
-    val top: Int = 0,
-    val left: Int = 0
-) {
-    fun isNotInitialized() = size == 0 && top == 0 && left == 0
 }
