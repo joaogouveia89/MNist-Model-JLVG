@@ -1,6 +1,7 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.ui
 
 import android.app.Application
+import android.graphics.Bitmap
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
@@ -8,9 +9,9 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
+import androidx.core.graphics.createBitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.joaogouveia89.mnistmodelapp.ktx.toBitmap
 import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameManager
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.CharacterPrediction
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
 class ScanViewModel(
@@ -67,8 +69,25 @@ class ScanViewModel(
                 return
             }
 
-            val frame = image.toBitmap()
+            val (yData, rowStride, pixelStride) = image.planes[0].let {
+                val bufferSize = it.buffer.remaining()
+                val yData = ByteArray(bufferSize)
+                it.buffer.get(yData)
+
+                Triple(yData, it.rowStride, it.pixelStride)
+            }
+
+            val width = image.width
+            val height = image.height
+
             viewModelScope.launch(Dispatchers.Default) {
+                val frame = imageToBitmap(
+                    yData = yData,
+                    rowStride = rowStride,
+                    pixelStride = pixelStride,
+                    width = width,
+                    height = height
+                )
                 try {
                     frameManager.predictFrame(frame)?.let { prediction ->
                         val confidencePercentage = (prediction.confidence * 100).toInt()
@@ -97,5 +116,28 @@ class ScanViewModel(
         super.onCleared()
         frameManager.release()
         executor.shutdown()
+    }
+
+    private fun imageToBitmap(
+        yData: ByteArray,
+        rowStride: Int,
+        pixelStride: Int,
+        width: Int,
+        height: Int,
+    ): Bitmap {
+        val bitmap = createBitmap(width, height, Bitmap.Config.ALPHA_8)
+        val dest = ByteArray(width * height)
+
+        var pos = 0
+        for (row in 0 until height) {
+            val rowStart = row * rowStride
+            for (col in 0 until width) {
+                val index = rowStart + col * pixelStride
+                dest[pos++] = yData[index]
+            }
+        }
+
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(dest))
+        return bitmap
     }
 }
