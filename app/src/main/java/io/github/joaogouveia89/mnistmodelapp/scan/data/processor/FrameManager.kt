@@ -7,6 +7,9 @@ import io.github.joaogouveia89.mnistmodelapp.ktx.rotateBitmap
 import io.github.joaogouveia89.mnistmodelapp.scan.data.ml.MnistModel
 import io.github.joaogouveia89.mnistmodelapp.scan.data.model.CropMeasurements
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.PredictionResult
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 /**
  * Coordinates camera frame processing
@@ -28,11 +31,18 @@ class FrameManager(
 
     private var cropMeasurements: CropMeasurements = CropMeasurements()
 
-    suspend fun predictFrame(frame: Bitmap): PredictionResult? {
+    private val _predictions = MutableSharedFlow<PredictionResult?>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
 
+    val predictions = _predictions.asSharedFlow()
+
+    suspend fun processFrame(frame: Bitmap) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastPredictionTime < minIntervalMs) {
-            return null
+            return
         }
 
         lastPredictionTime = currentTime
@@ -54,18 +64,20 @@ class FrameManager(
         val hasSignificantChange = histogramAnalyzer.isSignificantChange(histogram)
 
         if (!hasSignificantChange) {
-            return null
+            return
         }
 
         val modelInput = imagePreprocessor.preProcessForModel(cropped)
 
-        val modelPrediction = mnistModel.predict(modelInput) ?: return null
+        val modelPrediction = mnistModel.predict(modelInput) ?: return
 
-        return PredictionResult(
+        val result = PredictionResult(
             predictedNumber = modelPrediction.predictedClass,
             confidence = modelPrediction.confidence,
             frame = cropped
         )
+
+        _predictions.emit(result)
     }
 
     fun reset() {

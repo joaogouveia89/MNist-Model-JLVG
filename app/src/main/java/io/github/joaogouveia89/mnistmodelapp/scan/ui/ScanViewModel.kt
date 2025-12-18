@@ -18,13 +18,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 
 class ScanViewModel(
-    private val application: Application
+    application: Application
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
@@ -60,6 +61,26 @@ class ScanViewModel(
             setAnalyzer(executor, ::analyzeImage)
         }
 
+
+    init {
+        viewModelScope.launch {
+            frameManager.predictions
+                .filterNotNull()
+                .collect { prediction ->
+                    _uiState.update { currentState ->
+                        val confidencePercentage = (prediction.confidence * 100).toInt()
+                        currentState.copy(
+                            prediction = CharacterPrediction(
+                                number = prediction.predictedNumber,
+                                confidence = confidencePercentage,
+                                frame = prediction.frame
+                            )
+                        )
+                    }
+                }
+        }
+    }
+
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
         try {
@@ -89,22 +110,9 @@ class ScanViewModel(
                     height = height
                 )
                 try {
-                    frameManager.predictFrame(frame)?.let { prediction ->
-                        val confidencePercentage = (prediction.confidence * 100).toInt()
-
-                        _uiState.update { currentState ->
-                            currentState.copy(
-                                prediction = CharacterPrediction(
-                                    number = prediction.predictedNumber,
-                                    confidence = confidencePercentage,
-                                    frame = prediction.frame
-                                )
-                            )
-                        }
-                    }
+                    frameManager.processFrame(frame)
                 } catch (e: Exception) {
-                    // Log the error silently - we don't want to crash due to a single problematic frame
-                    // In production, add appropriate logging (Firebase Crashlytics, etc.)
+                    // Log the error silently
                 }
             }
         } finally {
