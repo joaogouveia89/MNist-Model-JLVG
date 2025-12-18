@@ -10,6 +10,7 @@ import io.github.joaogouveia89.mnistmodelapp.scan.domain.PredictionResult
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlin.math.abs
 
 /**
  * Coordinates camera frame processing
@@ -17,13 +18,19 @@ import kotlinx.coroutines.flow.asSharedFlow
  */
 
 private const val TARGET_FPS: Int = 5 // 5 FPS
+private const val STABILITY_WINDOW_SIZE = 10 // Last 10 frames
+private const val STABILITY_THRESHOLD = 0.02 // 2% maximum variation between histograms
 
 class FrameManager(
     context: Context,
     val maskSize: Float = 0.4f
 ) {
     private val imagePreprocessor = ImagePreprocessor()
-    private val histogramAnalyzer = HistogramAnalyzer()
+    private val histogramAnalyzer = HistogramAnalyzer(
+        differenceThreshold = 5000.0,
+        stabilityWindowSize = STABILITY_WINDOW_SIZE,
+        stabilityThreshold = STABILITY_THRESHOLD
+    )
     private val mnistModel = MnistModel(context)
 
     private val minIntervalMs: Long = 1000L / TARGET_FPS
@@ -61,9 +68,19 @@ class FrameManager(
 
         val imageBytes = cropped.asByteArray()
         val histogram = histogramAnalyzer.generateHistogram(imageBytes)
+
+        // Adds to the stability buffer
+        histogramAnalyzer.addToStabilityBuffer(histogram)
+
+        // Check if there is significant change (movement).
         val hasSignificantChange = histogramAnalyzer.isSignificantChange(histogram)
 
         if (!hasSignificantChange) {
+            return
+        }
+
+        // It only processes if it's stable.
+        if (!histogramAnalyzer.isStable()) {
             return
         }
 
