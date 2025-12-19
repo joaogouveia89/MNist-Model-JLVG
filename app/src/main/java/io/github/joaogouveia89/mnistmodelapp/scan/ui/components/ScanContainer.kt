@@ -33,10 +33,12 @@ fun ScanContainer(
             maskSize = maskSize
         )
 
-        uiState.prediction?.let { prediction ->
+        if (uiState.prediction != null || uiState.isLoading) {
             PredictionResultBox(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                prediction = prediction
+                prediction = uiState.prediction,
+                isLoading = uiState.isLoading,
+                loadingProgress = uiState.loadingProgress
             )
         }
     }

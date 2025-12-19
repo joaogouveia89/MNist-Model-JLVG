@@ -22,11 +22,11 @@ import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.ImagePreprocess
 import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.InferenceRunner
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.CharacterPrediction
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameAnalysisConfig
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameProcessorState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
@@ -85,22 +85,43 @@ class ScanViewModel(
 
     init {
         viewModelScope.launch {
-            frameProcessor.predictions
-                .filterNotNull()
-                .collect { prediction ->
-                    _uiState.update { currentState ->
-                        val confidencePercentage = (prediction.confidence * 100).toInt()
-                        currentState.copy(
-                            prediction = CharacterPrediction(
-                                number = prediction.predictedNumber,
-                                confidence = confidencePercentage,
-                                frame = prediction.frame
+            frameProcessor.state.collect { state ->
+                _uiState.update { currentState ->
+                    when (state) {
+                        is FrameProcessorState.Idle -> {
+                            currentState.copy(
+                                prediction = null,
+                                loadingProgress = 0f,
+                                isLoading = false
                             )
-                        )
+                        }
+
+                        is FrameProcessorState.Loading -> {
+                            currentState.copy(
+                                prediction = null,
+                                loadingProgress = state.progress,
+                                isLoading = true
+                            )
+                        }
+
+                        is FrameProcessorState.Prediction -> {
+                            val confidencePercentage = (state.result.confidence * 100).toInt()
+                            currentState.copy(
+                                prediction = CharacterPrediction(
+                                    number = state.result.predictedNumber,
+                                    confidence = confidencePercentage,
+                                    frame = state.result.frame
+                                ),
+                                loadingProgress = 1f,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
+            }
         }
     }
+
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {

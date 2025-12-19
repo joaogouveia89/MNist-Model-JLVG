@@ -1,10 +1,10 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 
 import android.graphics.Bitmap
-import io.github.joaogouveia89.mnistmodelapp.scan.domain.PredictionResult
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameProcessorState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Coordinates camera frame processing
@@ -15,32 +15,56 @@ class FrameProcessor(
     private val frameRateLimiter: FrameRateLimiter,
     private val framePipeline: FramePipeline,
     private val frameGate: FrameGate,
-    private val inferenceRunner: InferenceRunner
+    private val inferenceRunner: InferenceRunner,
+    private val loadingTimeMs: Long = 3000L // 3 seconds of stability
 ) {
 
-    private val _predictions = MutableSharedFlow<PredictionResult>(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val _state = MutableStateFlow<FrameProcessorState>(FrameProcessorState.Idle)
+    val state: StateFlow<FrameProcessorState> = _state.asStateFlow()
 
-    val predictions = _predictions.asSharedFlow()
+    private var stableStartTime: Long? = null
 
     suspend fun process(frame: Bitmap) {
         if (!frameRateLimiter.canProcess()) return
 
         val processed = framePipeline.process(frame)
 
-        if (!frameGate.shouldProcess(processed.bytes)) return
+        val isStable = frameGate.shouldProcess(processed.bytes)
 
-        val result = inferenceRunner.run(processed.bitmap) ?: return
+        val now = System.currentTimeMillis()
 
-        _predictions.emit(result)
+        if (isStable) {
+            if (stableStartTime == null) {
+                stableStartTime = now
+            }
+
+            val elapsed = now - stableStartTime!!
+            val progress = (elapsed.toFloat() / loadingTimeMs).coerceIn(0f, 1f)
+
+            if (elapsed >= loadingTimeMs) {
+                // Tempo de estabilidade atingido, roda modelo
+                val result = inferenceRunner.run(processed.bitmap)
+                if (result != null) {
+                    _state.emit(FrameProcessorState.Prediction(result))
+                }
+                stableStartTime = null // reset após predição
+            } else {
+                _state.emit(FrameProcessorState.Loading(progress))
+            }
+
+        } else {
+            // Não estável, reseta contador e volta para Idle
+            stableStartTime = null
+            _state.emit(FrameProcessorState.Idle)
+        }
     }
 
     fun reset() {
         frameRateLimiter.reset()
         framePipeline.reset()
         frameGate.reset()
+        stableStartTime = null
+        _state.value = FrameProcessorState.Idle
     }
 
     fun release() {

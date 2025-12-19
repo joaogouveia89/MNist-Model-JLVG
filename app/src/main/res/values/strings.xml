@@ -5,4 +5,5 @@
     <string name="camera_permission_message_general">Hello! 👋\n\nThis app uses your camera to identify handwritten numbers using an AI model trained by us.\n\n To get started, please allow access to your camera.</string>
     <string name="predictionBoxResult">Prediction: %1$d</string>
     <string name="predictionBoxConfidence">Confidence: %1$d \%%</string>
+    <string name="predictionBoxStabilizing">Stabilizing...</string>
 </resources>
