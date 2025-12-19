@@ -1,6 +1,7 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.data.ml
 
 import android.content.Context
+import io.github.joaogouveia89.mnistmodelapp.scan.data.model.TfModelPrediction
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.nio.MappedByteBuffer
@@ -19,7 +20,7 @@ class MnistModel(
         Interpreter(loadModelFile(), tfLiteOptions)
     }
 
-    fun predict(input: Array<FloatArray>): ModelPrediction? {
+    fun predict(input: Array<FloatArray>): TfModelPrediction? {
         val output = Array(1) { FloatArray(10) }
         interpreter.run(input, output)
 
@@ -27,28 +28,25 @@ class MnistModel(
             .withIndex()
             .maxByOrNull { it.value }
             ?.let { prediction ->
-                ModelPrediction(
+                TfModelPrediction(
                     predictedClass = prediction.index,
                     confidence = prediction.value
                 )
             }
     }
 
-    private fun loadModelFile(): MappedByteBuffer {
-        val fileDescriptor = context.assets.openFd(modelName)
-        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
-        val fileChannel = inputStream.channel
-        val startOffset = fileDescriptor.startOffset
-        val declaredLength = fileDescriptor.declaredLength
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
-    }
+    private fun loadModelFile(): MappedByteBuffer =
+        context.assets.openFd(modelName).use { fileDescriptor ->
+            FileInputStream(fileDescriptor.fileDescriptor).use { inputStream ->
+                inputStream.channel.map(
+                    FileChannel.MapMode.READ_ONLY,
+                    fileDescriptor.startOffset,
+                    fileDescriptor.declaredLength
+                )
+            }
+        }
 
     fun close() {
         interpreter.close()
     }
 }
-
-data class ModelPrediction(
-    val predictedClass: Int,
-    val confidence: Float
-)
