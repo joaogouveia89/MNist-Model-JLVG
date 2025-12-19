@@ -12,7 +12,14 @@ import androidx.camera.core.Preview
 import androidx.core.graphics.createBitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameManager
+import io.github.joaogouveia89.mnistmodelapp.scan.data.ml.MnistModel
+import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameGate
+import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FramePipeline
+import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameProcessor
+import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameRateLimiter
+import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.HistogramAnalyzer
+import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.ImagePreprocessor
+import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.InferenceRunner
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.CharacterPrediction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +30,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
+
+private const val STABILITY_WINDOW_SIZE = 10 // Last 10 frames
+private const val STABILITY_THRESHOLD = 0.02 // 2% maximum variation between histograms
+
+private const val MASK_SIZE = 0.4f
 
 class ScanViewModel(
     application: Application
@@ -36,12 +48,27 @@ class ScanViewModel(
 
     val cameraSelector: CameraSelector = DEFAULT_BACK_CAMERA
 
-    private val frameManager = FrameManager(
-        context = application.applicationContext
+    private val frameProcessor = FrameProcessor(
+        frameRateLimiter = FrameRateLimiter,
+        framePipeline = FramePipeline(
+            imagePreprocessor = ImagePreprocessor(),
+            maskSize = MASK_SIZE
+        ),
+        frameGate = FrameGate(
+            histogramAnalyzer = HistogramAnalyzer(
+                differenceThreshold = 5000.0,
+                stabilityWindowSize = STABILITY_WINDOW_SIZE,
+                stabilityThreshold = STABILITY_THRESHOLD
+            )
+        ),
+        inferenceRunner = InferenceRunner(
+            imagePreprocessor = ImagePreprocessor(),
+            model = MnistModel(application.applicationContext)
+        )
     )
 
     val maskSize: Float
-        get() = frameManager.maskSize
+        get() = MASK_SIZE
 
 
     val cameraPreviewUseCase: Preview = Preview.Builder()
@@ -64,7 +91,7 @@ class ScanViewModel(
 
     init {
         viewModelScope.launch {
-            frameManager.predictions
+            frameProcessor.predictions
                 .filterNotNull()
                 .collect { prediction ->
                     _uiState.update { currentState ->
@@ -110,7 +137,7 @@ class ScanViewModel(
                     height = height
                 )
                 try {
-                    frameManager.processFrame(frame)
+                    frameProcessor.process(frame)
                 } catch (e: Exception) {
                     // Log the error silently
                 }
@@ -122,7 +149,7 @@ class ScanViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        frameManager.release()
+        frameProcessor.release()
         executor.shutdown()
     }
 
