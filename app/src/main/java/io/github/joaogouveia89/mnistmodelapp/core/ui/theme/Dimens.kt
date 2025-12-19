@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.dp
 object Dimens {
     val screenPaddingHorizontal = 24.dp
     val screenPaddingVertical = 16.dp
-    val contentSpacingMedium = 16.dp
     val contentSpacingLarge = 24.dp
     val iconSizeLarge = 80.dp
     val buttonHeight = 56.dp
