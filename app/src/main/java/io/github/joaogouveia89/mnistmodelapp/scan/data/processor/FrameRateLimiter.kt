@@ -1,9 +1,9 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 
-private const val TARGET_FPS = 5
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameAnalysisConfig
 
 object FrameRateLimiter {
-    private const val MIN_INTERVAL_MS = 1000L / TARGET_FPS
+    private const val MIN_INTERVAL_MS = 1000L / FrameAnalysisConfig.TARGET_FPS
     private var lastExecution = 0L
 
     fun canProcess(now: Long = System.currentTimeMillis()): Boolean {

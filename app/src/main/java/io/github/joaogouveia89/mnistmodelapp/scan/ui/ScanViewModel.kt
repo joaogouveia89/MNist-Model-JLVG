@@ -21,6 +21,7 @@ import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.HistogramAnalyz
 import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.ImagePreprocessor
 import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.InferenceRunner
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.CharacterPrediction
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameAnalysisConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,11 +31,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
-
-private const val STABILITY_WINDOW_SIZE = 10 // Last 10 frames
-private const val STABILITY_THRESHOLD = 0.02 // 2% maximum variation between histograms
-
-private const val MASK_SIZE = 0.4f
 
 class ScanViewModel(
     application: Application
@@ -52,13 +48,13 @@ class ScanViewModel(
         frameRateLimiter = FrameRateLimiter,
         framePipeline = FramePipeline(
             imagePreprocessor = ImagePreprocessor(),
-            maskSize = MASK_SIZE
+            maskSize = FrameAnalysisConfig.MASK_SIZE
         ),
         frameGate = FrameGate(
             histogramAnalyzer = HistogramAnalyzer(
                 differenceThreshold = 5000.0,
-                stabilityWindowSize = STABILITY_WINDOW_SIZE,
-                stabilityThreshold = STABILITY_THRESHOLD
+                stabilityWindowSize = FrameAnalysisConfig.STABILITY_WINDOW_SIZE,
+                stabilityThreshold = FrameAnalysisConfig.STABILITY_THRESHOLD
             )
         ),
         inferenceRunner = InferenceRunner(
@@ -67,9 +63,7 @@ class ScanViewModel(
         )
     )
 
-    val maskSize: Float
-        get() = MASK_SIZE
-
+    val maskSize: Float = FrameAnalysisConfig.MASK_SIZE
 
     val cameraPreviewUseCase: Preview = Preview.Builder()
         .build()
