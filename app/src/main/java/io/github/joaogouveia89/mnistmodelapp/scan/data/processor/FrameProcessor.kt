@@ -42,18 +42,18 @@ class FrameProcessor(
             val progress = (elapsed.toFloat() / loadingTimeMs).coerceIn(0f, 1f)
 
             if (elapsed >= loadingTimeMs) {
-                // Tempo de estabilidade atingido, roda modelo
+                // Stability time reached, run the model
                 val result = inferenceRunner.run(processed.bitmap)
                 if (result != null) {
                     _state.emit(FrameProcessorState.Prediction(result))
                 }
-                stableStartTime = null // reset após predição
+                stableStartTime = null // reset after prediction
             } else {
                 _state.emit(FrameProcessorState.Loading(progress))
             }
 
         } else {
-            // Não estável, reseta contador e volta para Idle
+            // Unstable, resets counter and returns to Idle.
             stableStartTime = null
             _state.emit(FrameProcessorState.Idle)
         }

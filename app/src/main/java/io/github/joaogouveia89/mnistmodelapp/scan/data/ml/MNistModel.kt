@@ -13,7 +13,7 @@ class MnistModel(
     private val context: Context,
     private val modelName: String = "mnist-jg.tflite"
 ) {
-    private val tfLiteOptions = Interpreter.Options() // pode ser configurado para usar GPUDelegate
+    private val tfLiteOptions = Interpreter.Options() // It can be configured to use GPUDelegate.
 
     private val interpreter: Interpreter by lazy {
         Interpreter(loadModelFile(), tfLiteOptions)
