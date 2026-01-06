@@ -52,7 +52,7 @@ class ScanViewModel(
         ),
         frameGate = FrameGate(
             histogramAnalyzer = HistogramAnalyzer(
-                differenceThreshold = 5000.0,
+                differenceThreshold = FrameAnalysisConfig.DIFFERENCE_THRESHOLD,
                 stabilityWindowSize = FrameAnalysisConfig.STABILITY_WINDOW_SIZE,
                 stabilityThreshold = FrameAnalysisConfig.STABILITY_THRESHOLD
             )
