@@ -1,6 +1,7 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 
 import android.graphics.Bitmap
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameAnalysisConfig
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameProcessorState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,6 @@ class FrameProcessor(
     private val framePipeline: FramePipeline,
     private val frameGate: FrameGate,
     private val inferenceRunner: InferenceRunner,
-    private val loadingTimeMs: Long = 3000L // 3 seconds of stability
 ) {
 
     private val _state = MutableStateFlow<FrameProcessorState>(FrameProcessorState.Idle)
@@ -39,9 +39,9 @@ class FrameProcessor(
             }
 
             val elapsed = now - stableStartTime!!
-            val progress = (elapsed.toFloat() / loadingTimeMs).coerceIn(0f, 1f)
+            val progress = (elapsed.toFloat() / FrameAnalysisConfig.STABILITY_DURATION_MS).coerceIn(0f, 1f)
 
-            if (elapsed >= loadingTimeMs) {
+            if (elapsed >= FrameAnalysisConfig.STABILITY_DURATION_MS) {
                 // Stability time reached, run the model
                 val result = inferenceRunner.run(processed.bitmap)
                 if (result != null) {

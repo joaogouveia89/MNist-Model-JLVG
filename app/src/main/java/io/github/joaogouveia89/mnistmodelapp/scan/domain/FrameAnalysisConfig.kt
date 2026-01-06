@@ -32,4 +32,11 @@ object FrameAnalysisConfig {
      * Typical range: 2000-5000 depending on lighting and camera conditions.
      */
     const val DIFFERENCE_THRESHOLD = 8000.0
+
+    /**
+     * Time (in milliseconds) the camera must remain stable before triggering prediction.
+     * Provides visual feedback through loading progress indicator.
+     * Balances between quick responsiveness and ensuring frame stability.
+     */
+    const val STABILITY_DURATION_MS = 1500L  // 1.5 seconds
 }
