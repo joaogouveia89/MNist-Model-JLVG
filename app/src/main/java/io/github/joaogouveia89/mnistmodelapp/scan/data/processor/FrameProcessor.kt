@@ -23,6 +23,7 @@ class FrameProcessor(
     val state: StateFlow<FrameProcessorState> = _state.asStateFlow()
 
     private var stableStartTime: Long? = null
+    private var predictionShownAt: Long? = null
 
     suspend fun process(frame: Bitmap) {
         if (!frameRateLimiter.canProcess()) return
@@ -32,6 +33,14 @@ class FrameProcessor(
         val isStable = frameGate.shouldProcess(processed.bytes)
 
         val now = System.currentTimeMillis()
+
+        predictionShownAt?.let { shownAt ->
+            if (now - shownAt < FrameAnalysisConfig.PREDICTION_DISPLAY_DURATION_MS) {
+                return // While still showing the prediction, it ignores new frames.
+            }
+            // Time expired, you can process a new frame.
+            predictionShownAt = null
+        }
 
         if (isStable) {
             if (stableStartTime == null) {
@@ -46,6 +55,7 @@ class FrameProcessor(
                 val result = inferenceRunner.run(processed.bitmap)
                 if (result != null) {
                     _state.emit(FrameProcessorState.Prediction(result))
+                    predictionShownAt = now
                 }
                 stableStartTime = null // reset after prediction
             } else {

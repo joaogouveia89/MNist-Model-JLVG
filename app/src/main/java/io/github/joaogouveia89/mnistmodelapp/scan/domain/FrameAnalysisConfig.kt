@@ -39,4 +39,10 @@ object FrameAnalysisConfig {
      * Balances between quick responsiveness and ensuring frame stability.
      */
     const val STABILITY_DURATION_MS = 1500L  // 1.5 seconds
+
+    /**
+     * Time (in milliseconds) to display prediction result before allowing new capture.
+     * Gives user time to see and understand the prediction.
+     */
+    const val PREDICTION_DISPLAY_DURATION_MS = 3000L // 3 seconds
 }
