@@ -1,6 +1,8 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 
-class FrameGate(
+import javax.inject.Inject
+
+class FrameGate @Inject constructor(
     private val histogramAnalyzer: HistogramAnalyzer
 ) {
 

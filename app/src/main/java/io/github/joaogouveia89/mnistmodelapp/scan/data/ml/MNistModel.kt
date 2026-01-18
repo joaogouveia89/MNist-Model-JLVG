@@ -1,19 +1,23 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.data.ml
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.joaogouveia89.mnistmodelapp.scan.data.model.TfModelPrediction
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Load and run the TensorFlow Lite model.
  */
-class MnistModel(
-    private val context: Context,
-    private val modelName: String = "mnist-jg.tflite"
+@Singleton
+class MnistModel @Inject constructor(
+    @ApplicationContext private val context: Context
 ) {
+    private val modelName: String = "mnist-jg.tflite"
     private val tfLiteOptions = Interpreter.Options() // It can be configured to use GPUDelegate.
 
     private val interpreter: Interpreter by lazy {

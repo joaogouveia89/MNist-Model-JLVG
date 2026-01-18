@@ -1,6 +1,5 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.ui
 
-import android.app.Application
 import android.graphics.Bitmap
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
@@ -10,16 +9,10 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.core.graphics.createBitmap
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.joaogouveia89.mnistmodelapp.scan.data.ml.MnistModel
-import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameGate
-import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FramePipeline
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameProcessor
-import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.FrameRateLimiter
-import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.HistogramAnalyzer
-import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.ImagePreprocessor
-import io.github.joaogouveia89.mnistmodelapp.scan.data.processor.InferenceRunner
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.CharacterPrediction
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameAnalysisConfig
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameProcessorState
@@ -31,10 +24,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
-class ScanViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+@HiltViewModel
+class ScanViewModel @Inject constructor(
+    private val frameProcessor: FrameProcessor
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
     val uiState: StateFlow<MNistCheckingUiState> = _uiState.asStateFlow()
@@ -43,25 +38,6 @@ class ScanViewModel(
     private val executor = Executors.newSingleThreadExecutor()
 
     val cameraSelector: CameraSelector = DEFAULT_BACK_CAMERA
-
-    private val frameProcessor = FrameProcessor(
-        frameRateLimiter = FrameRateLimiter,
-        framePipeline = FramePipeline(
-            imagePreprocessor = ImagePreprocessor(),
-            maskSize = FrameAnalysisConfig.MASK_SIZE
-        ),
-        frameGate = FrameGate(
-            histogramAnalyzer = HistogramAnalyzer(
-                differenceThreshold = FrameAnalysisConfig.DIFFERENCE_THRESHOLD,
-                stabilityWindowSize = FrameAnalysisConfig.STABILITY_WINDOW_SIZE,
-                stabilityThreshold = FrameAnalysisConfig.STABILITY_THRESHOLD
-            )
-        ),
-        inferenceRunner = InferenceRunner(
-            imagePreprocessor = ImagePreprocessor(),
-            model = MnistModel(application.applicationContext)
-        )
-    )
 
     val maskSize: Float = FrameAnalysisConfig.MASK_SIZE
 

@@ -5,12 +5,13 @@ import androidx.core.graphics.scale
 import io.github.joaogouveia89.mnistmodelapp.ktx.asByteArray
 import io.github.joaogouveia89.mnistmodelapp.ktx.crop
 import io.github.joaogouveia89.mnistmodelapp.scan.data.model.CropMeasurements
+import javax.inject.Inject
 
 /*
  * Prepare images for model analysis.
  */
 
-class ImagePreprocessor {
+class ImagePreprocessor @Inject constructor() {
 
     fun cropImage(
         bitmap: Bitmap,

@@ -1,19 +1,21 @@
 package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameAnalysisConfig
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.pow
 
 /**
  * Histogram analysis to detect significant changes between frames.
  */
-class HistogramAnalyzer(
-    private val differenceThreshold: Double = 5000.0,
-    private val stabilityWindowSize: Int = 10,
-    private val stabilityThreshold: Double = 0.02
-) {
-    private val histMutex = Mutex()
+class HistogramAnalyzer @Inject constructor() {
+    private val differenceThreshold: Double = FrameAnalysisConfig.DIFFERENCE_THRESHOLD
+    private val stabilityWindowSize: Int = FrameAnalysisConfig.STABILITY_WINDOW_SIZE
+    private val stabilityThreshold: Double = FrameAnalysisConfig.STABILITY_THRESHOLD
+
+    private val hitMutex = Mutex()
 
     @Volatile
     private var previousHist: IntArray = intArrayOf()
@@ -95,7 +97,7 @@ class HistogramAnalyzer(
     }
 
     private suspend fun calculateDifference(h1: IntArray): Double {
-        return histMutex.withLock {
+        return hitMutex.withLock {
             if (previousHist.isEmpty()) {
                 previousHist = h1
                 return@withLock Double.MAX_VALUE

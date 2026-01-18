@@ -3,8 +3,9 @@ package io.github.joaogouveia89.mnistmodelapp.scan.data.processor
 import android.graphics.Bitmap
 import io.github.joaogouveia89.mnistmodelapp.scan.data.ml.MnistModel
 import io.github.joaogouveia89.mnistmodelapp.scan.domain.PredictionResult
+import javax.inject.Inject
 
-class InferenceRunner(
+class InferenceRunner @Inject constructor(
     private val imagePreprocessor: ImagePreprocessor,
     private val model: MnistModel
 ) {

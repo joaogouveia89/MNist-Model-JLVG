@@ -5,11 +5,13 @@ import io.github.joaogouveia89.mnistmodelapp.ktx.asByteArray
 import io.github.joaogouveia89.mnistmodelapp.ktx.rotateBitmap
 import io.github.joaogouveia89.mnistmodelapp.scan.data.model.CropMeasurements
 import io.github.joaogouveia89.mnistmodelapp.scan.data.model.ProcessedFrame
+import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameAnalysisConfig
+import javax.inject.Inject
 
-class FramePipeline(
-    private val imagePreprocessor: ImagePreprocessor,
-    private val maskSize: Float
+class FramePipeline @Inject constructor(
+    private val imagePreprocessor: ImagePreprocessor
 ) {
+    private val maskSize: Float = FrameAnalysisConfig.MASK_SIZE
     private var cropMeasurements: CropMeasurements = CropMeasurements()
 
     fun process(frame: Bitmap): ProcessedFrame {
@@ -36,5 +38,3 @@ class FramePipeline(
         cropMeasurements = CropMeasurements()
     }
 }
-
-

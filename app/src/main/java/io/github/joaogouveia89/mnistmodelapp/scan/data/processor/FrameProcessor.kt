@@ -6,13 +6,14 @@ import io.github.joaogouveia89.mnistmodelapp.scan.domain.FrameProcessorState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 /**
  * Coordinates camera frame processing
  * Orchestrates ImagePreprocessor, HistogramAnalyzer, and MnistModel
  */
 
-class FrameProcessor(
+class FrameProcessor @Inject constructor(
     private val frameRateLimiter: FrameRateLimiter,
     private val framePipeline: FramePipeline,
     private val frameGate: FrameGate,
