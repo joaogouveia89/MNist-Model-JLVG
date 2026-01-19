@@ -26,6 +26,14 @@ import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
+/**
+ * Commands represent actions that the View can trigger.
+ */
+sealed interface ScanCommand {
+    data class OnCameraError(val message: String) : ScanCommand
+    object DismissError : ScanCommand
+}
+
 @HiltViewModel
 class ScanViewModel @Inject constructor(
     private val frameProcessor: FrameProcessor
@@ -34,20 +42,17 @@ class ScanViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
     val uiState: StateFlow<MNistCheckingUiState> = _uiState.asStateFlow()
 
-    // Executor for image analysis (dedicated single thread)
     private val executor = Executors.newSingleThreadExecutor()
 
+    // Constantes e UseCases mantidos como propriedades para o setup da câmera
     val cameraSelector: CameraSelector = DEFAULT_BACK_CAMERA
-
     val maskSize: Float = FrameAnalysisConfig.MASK_SIZE
 
     val cameraPreviewUseCase: Preview = Preview.Builder()
         .build()
         .apply {
             setSurfaceProvider { newSurfaceRequest ->
-                _uiState.update { currentState ->
-                    currentState.copy(surfaceRequest = newSurfaceRequest)
-                }
+                _uiState.update { it.copy(surfaceRequest = newSurfaceRequest) }
             }
         }
 
@@ -58,79 +63,81 @@ class ScanViewModel @Inject constructor(
             setAnalyzer(executor, ::analyzeImage)
         }
 
-
     init {
+        observeProcessorState()
+    }
+
+    /**
+     * Single entry point for View interactions.
+     */
+    fun execute(command: ScanCommand) {
+        when (command) {
+            is ScanCommand.OnCameraError -> handleCameraError(command.message)
+            ScanCommand.DismissError -> dismissError()
+        }
+    }
+
+    private fun observeProcessorState() {
         viewModelScope.launch {
             frameProcessor.state.collect { state ->
-                _uiState.update { currentState ->
-                    when (state) {
-                        is FrameProcessorState.Idle -> {
-                            currentState.copy(
-                                prediction = null,
-                                loadingProgress = 0f,
-                                isLoading = false
-                            )
-                        }
+                updateUiStateFromProcessor(state)
+            }
+        }
+    }
 
-                        is FrameProcessorState.Loading -> {
-                            currentState.copy(
-                                prediction = null,
-                                loadingProgress = state.progress,
-                                isLoading = true
-                            )
-                        }
-
-                        is FrameProcessorState.Prediction -> {
-                            val confidencePercentage = (state.result.confidence * 100).toInt()
-                            currentState.copy(
-                                prediction = CharacterPrediction(
-                                    number = state.result.predictedNumber,
-                                    confidence = confidencePercentage,
-                                    frame = state.result.frame
-                                ),
-                                loadingProgress = 1f,
-                                isLoading = false
-                            )
-                        }
-                    }
+    private fun updateUiStateFromProcessor(state: FrameProcessorState) {
+        _uiState.update { currentState ->
+            when (state) {
+                is FrameProcessorState.Idle -> {
+                    currentState.copy(prediction = null, loadingProgress = 0f, isLoading = false)
+                }
+                is FrameProcessorState.Loading -> {
+                    currentState.copy(prediction = null, loadingProgress = state.progress, isLoading = true)
+                }
+                is FrameProcessorState.Prediction -> {
+                    val confidencePercentage = (state.result.confidence * 100).toInt()
+                    currentState.copy(
+                        prediction = CharacterPrediction(
+                            number = state.result.predictedNumber,
+                            confidence = confidencePercentage,
+                            frame = state.result.frame
+                        ),
+                        loadingProgress = 1f,
+                        isLoading = false
+                    )
                 }
             }
         }
     }
 
+    private fun handleCameraError(message: String) {
+        _uiState.update { it.copy(errorMessage = message) }
+    }
+
+    private fun dismissError() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
         try {
-            val image = imageProxy.image
-            if (image == null) {
-                imageProxy.close()
-                return
-            }
-
-            val (yData, rowStride, pixelStride) = image.planes[0].let {
-                val bufferSize = it.buffer.remaining()
-                val yData = ByteArray(bufferSize)
-                it.buffer.get(yData)
-
-                Triple(yData, it.rowStride, it.pixelStride)
-            }
+            val image = imageProxy.image ?: return
+            val plane = image.planes[0]
+            val buffer = plane.buffer
+            val yData = ByteArray(buffer.remaining())
+            buffer.get(yData)
 
             val width = image.width
             val height = image.height
+            val rowStride = plane.rowStride
+            val pixelStride = plane.pixelStride
 
             viewModelScope.launch(Dispatchers.Default) {
-                val frame = imageToBitmap(
-                    yData = yData,
-                    rowStride = rowStride,
-                    pixelStride = pixelStride,
-                    width = width,
-                    height = height
-                )
+                val frame = imageToBitmap(yData, rowStride, pixelStride, width, height)
                 try {
                     frameProcessor.process(frame)
                 } catch (e: Exception) {
-                    _uiState.update { it.copy(errorMessage = "Processing error: ${e.localizedMessage}") }
+                    execute(ScanCommand.OnCameraError("Processing error: ${e.localizedMessage}"))
                 }
             }
         } finally {
@@ -138,34 +145,12 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    fun onCameraError(message: String) {
-        _uiState.update { it.copy(errorMessage = message) }
-    }
-
-    fun onErrorMessageDismissed() {
-        _uiState.update { it.copy(errorMessage = null) }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        frameProcessor.release()
-        executor.shutdown()
-    }
-
-    private fun imageToBitmap(
-        yData: ByteArray,
-        rowStride: Int,
-        pixelStride: Int,
-        width: Int,
-        height: Int,
-    ): Bitmap {
+    private fun imageToBitmap(yData: ByteArray, rowStride: Int, pixelStride: Int, width: Int, height: Int): Bitmap {
         val bitmap = createBitmap(width, height, Bitmap.Config.ALPHA_8)
-
         if (pixelStride == 1 && rowStride == width) {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(yData))
             return bitmap
         }
-
         val dest = ByteArray(width * height)
         var pos = 0
         for (row in 0 until height) {
@@ -174,8 +159,13 @@ class ScanViewModel @Inject constructor(
                 dest[pos++] = yData[rowStart + col * pixelStride]
             }
         }
-
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(dest))
         return bitmap
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        frameProcessor.release()
+        executor.shutdown()
     }
 }

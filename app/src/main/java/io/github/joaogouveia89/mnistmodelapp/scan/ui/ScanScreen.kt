@@ -39,7 +39,7 @@ fun ScanScreen(
     uiState.errorMessage?.let { message ->
         LaunchedEffect(message) {
             snackbarHostState.showSnackbar(message)
-            viewModel.onErrorMessageDismissed()
+            viewModel.execute(ScanCommand.DismissError)
         }
     }
 
@@ -51,7 +51,7 @@ fun ScanScreen(
                 cameraPreviewUseCase = viewModel.cameraPreviewUseCase,
                 imageAnalyzer = viewModel.imageAnalyzer,
                 cameraSelector = viewModel.cameraSelector,
-                onCameraError = viewModel::onCameraError
+                onCameraError = { error -> viewModel.execute(ScanCommand.OnCameraError(error)) }
             )
         } else {
             CameraPermissionScreen(
