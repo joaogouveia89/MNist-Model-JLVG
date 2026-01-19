@@ -15,14 +15,14 @@ import kotlinx.coroutines.guava.await
 fun CameraLifecycleManager(
     preview: Preview,
     imageAnalyzer: ImageAnalysis,
-    cameraSelector: CameraSelector
+    cameraSelector: CameraSelector,
+    onError: (String) -> Unit = {}
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
     LaunchedEffect(lifecycleOwner) {
         try {
-
             val cameraProvider = ProcessCameraProvider.getInstance(context).await()
 
             cameraProvider.unbindAll()
@@ -34,9 +34,7 @@ fun CameraLifecycleManager(
                 imageAnalyzer
             )
         } catch (e: Exception) {
-            // In case of an error during camera initialization
-            // Appropriate log or communication with ViewModel via callback
-            // For now, fail silently to avoid crashing the app
+            onError("Failed to initialize camera: ${e.localizedMessage ?: "Unknown error"}")
         }
     }
 

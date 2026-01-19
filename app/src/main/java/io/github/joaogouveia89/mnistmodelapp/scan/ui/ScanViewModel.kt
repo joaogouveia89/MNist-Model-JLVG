@@ -130,12 +130,20 @@ class ScanViewModel @Inject constructor(
                 try {
                     frameProcessor.process(frame)
                 } catch (e: Exception) {
-                    // Log the error silently
+                    _uiState.update { it.copy(errorMessage = "Processing error: ${e.localizedMessage}") }
                 }
             }
         } finally {
             imageProxy.close()
         }
+    }
+
+    fun onCameraError(message: String) {
+        _uiState.update { it.copy(errorMessage = message) }
+    }
+
+    fun onErrorMessageDismissed() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 
     override fun onCleared() {

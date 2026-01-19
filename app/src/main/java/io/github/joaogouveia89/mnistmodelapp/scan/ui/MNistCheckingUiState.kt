@@ -7,5 +7,6 @@ data class MNistCheckingUiState(
     val surfaceRequest: SurfaceRequest? = null,
     val prediction: CharacterPrediction? = null,
     val loadingProgress: Float = 0f,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 )
