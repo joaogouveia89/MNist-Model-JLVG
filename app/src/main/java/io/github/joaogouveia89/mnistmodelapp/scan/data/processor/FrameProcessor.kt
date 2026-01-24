@@ -25,6 +25,7 @@ class FrameProcessor @Inject constructor(
 
     private var stableStartTime: Long? = null
     private var predictionShownAt: Long? = null
+    private var hasPredictedForCurrentStability = false
 
     suspend fun process(frame: Bitmap) {
         if (!frameRateLimiter.canProcess()) return
@@ -35,15 +36,21 @@ class FrameProcessor @Inject constructor(
 
         val now = System.currentTimeMillis()
 
-        predictionShownAt?.let { shownAt ->
-            if (now - shownAt < FrameAnalysisConfig.PREDICTION_DISPLAY_DURATION_MS) {
-                return // While still showing the prediction, it ignores new frames.
-            }
-            // Time expired, you can process a new frame.
-            predictionShownAt = null
-        }
-
         if (isStable) {
+            if (hasPredictedForCurrentStability) {
+                // Already made a prediction for this stable session.
+                // Keep the current prediction on screen.
+                return
+            }
+
+            // If we are still in the display duration of a previous prediction session,
+            // wait before starting a new stability timer or showing loading progress.
+            predictionShownAt?.let { shownAt ->
+                if (now - shownAt < FrameAnalysisConfig.PREDICTION_DISPLAY_DURATION_MS) {
+                    return
+                }
+            }
+
             if (stableStartTime == null) {
                 stableStartTime = now
             }
@@ -57,6 +64,7 @@ class FrameProcessor @Inject constructor(
                 if (result != null) {
                     _state.emit(FrameProcessorState.Prediction(result))
                     predictionShownAt = now
+                    hasPredictedForCurrentStability = true
                 }
                 stableStartTime = null // reset after prediction
             } else {
@@ -64,9 +72,16 @@ class FrameProcessor @Inject constructor(
             }
 
         } else {
-            // Unstable, resets counter and returns to Idle.
+            // Unstable, resets stability tracking
             stableStartTime = null
-            _state.emit(FrameProcessorState.Idle)
+            hasPredictedForCurrentStability = false
+
+            // Clear prediction state only if display duration has passed
+            val shownAt = predictionShownAt
+            if (shownAt == null || now - shownAt >= FrameAnalysisConfig.PREDICTION_DISPLAY_DURATION_MS) {
+                predictionShownAt = null
+                _state.emit(FrameProcessorState.Idle)
+            }
         }
     }
 
@@ -75,6 +90,8 @@ class FrameProcessor @Inject constructor(
         framePipeline.reset()
         frameGate.reset()
         stableStartTime = null
+        predictionShownAt = null
+        hasPredictedForCurrentStability = false
         _state.value = FrameProcessorState.Idle
     }
 
