@@ -50,6 +50,15 @@ The use of ReLU activation in the hidden layers enables the model to learn compl
 4. The model will predict digits from the central area of the frame in real time
 
 ## Project Tags
+[v1.0.0](https://github.com/joaogouveia89/MNist-Model-JLVG/releases/tag/v1.0.0)
+> This version represents a significant evolution from the initial proof-of-concept, focusing on architectural robustness and a more refined user experience.
+Key improvements include:
+- **Architecture & Responsibility Segregation**: Moved from a monolithic approach to a clean pipeline where frame processing is decoupled into specific components (`FramePipeline`, `FrameGate`, `FrameProcessor`).
+- **Dependency Injection**: Integrated **Hilt** to manage dependencies, improving testability and code maintainability.
+- **Enhanced Stability Logic**: Implemented a prediction lock that keeps the result on screen as long as the camera remains stable, preventing flickering and redundant processing.
+- **Filter Calibration**: Fine-tuned preprocessing filters and stability thresholds to balance responsiveness and accuracy, resulting in a snappier real-time experience.
+- **Modern Tech Stack**: Full implementation using **Jetpack Compose** and **CameraX Viewfinder** for a modern, reactive UI.
+
 [proof-of-concept](https://github.com/joaogouveia89/MNist-Model-JLVG/releases/tag/proof-of-concept)
 > This initial version focuses primarily on validating the integration between Android’s CameraX API, image preprocessing, and TensorFlow Lite inference in real time.
 At this stage, development best practices and architectural patterns were considered but not the main priority — the main goal was to prove the feasibility of capturing a camera frame, performing simple manipulations, running it through a TensorFlow model, and displaying the prediction to the user.
