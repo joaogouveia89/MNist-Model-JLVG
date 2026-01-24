@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MNist Model App"
+rootProject.name = "InkSight"
 include(":app")
- 

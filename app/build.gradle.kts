@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "io.github.joaogouveia89.mnistmodelapp"
+    namespace = "io.github.joaogouveia89.inksight"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "io.github.joaogouveia89.mnistmodelapp"
+        applicationId = "io.github.joaogouveia89.inksight"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
