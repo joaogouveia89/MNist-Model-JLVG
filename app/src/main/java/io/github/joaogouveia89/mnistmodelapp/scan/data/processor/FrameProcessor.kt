@@ -56,7 +56,8 @@ class FrameProcessor @Inject constructor(
             }
 
             val elapsed = now - stableStartTime!!
-            val progress = (elapsed.toFloat() / FrameAnalysisConfig.STABILITY_DURATION_MS).coerceIn(0f, 1f)
+            val progress =
+                (elapsed.toFloat() / FrameAnalysisConfig.STABILITY_DURATION_MS).coerceIn(0f, 1f)
 
             if (elapsed >= FrameAnalysisConfig.STABILITY_DURATION_MS) {
                 // Stability time reached, run the model

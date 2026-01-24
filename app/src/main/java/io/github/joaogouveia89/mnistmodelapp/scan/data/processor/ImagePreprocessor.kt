@@ -32,7 +32,7 @@ class ImagePreprocessor @Inject constructor() {
         val scaledImage = cropped.scale(targetWidth, targetHeight, true)
         val imageBytes = scaledImage.asByteArray()
         val pixels = imageBytes.map { (it.toInt() and 0xFF) }
-        
+
         val threshold = calculateOtsuThreshold(pixels)
 
         val input = Array(1) {

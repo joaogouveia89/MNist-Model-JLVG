@@ -91,9 +91,15 @@ class ScanViewModel @Inject constructor(
                 is FrameProcessorState.Idle -> {
                     currentState.copy(prediction = null, loadingProgress = 0f, isLoading = false)
                 }
+
                 is FrameProcessorState.Loading -> {
-                    currentState.copy(prediction = null, loadingProgress = state.progress, isLoading = true)
+                    currentState.copy(
+                        prediction = null,
+                        loadingProgress = state.progress,
+                        isLoading = true
+                    )
                 }
+
                 is FrameProcessorState.Prediction -> {
                     val confidencePercentage = (state.result.confidence * 100).toInt()
                     currentState.copy(
@@ -145,7 +151,13 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    private fun imageToBitmap(yData: ByteArray, rowStride: Int, pixelStride: Int, width: Int, height: Int): Bitmap {
+    private fun imageToBitmap(
+        yData: ByteArray,
+        rowStride: Int,
+        pixelStride: Int,
+        width: Int,
+        height: Int
+    ): Bitmap {
         val bitmap = createBitmap(width, height, Bitmap.Config.ALPHA_8)
         if (pixelStride == 1 && rowStride == width) {
             bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(yData))
