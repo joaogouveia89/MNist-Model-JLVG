@@ -3,15 +3,15 @@ package io.github.joaogouveia89.mnistmodelapp.scan.domain
 object FrameAnalysisConfig {
     /**
      * Number of consecutive frames required for stability analysis.
-     * At 5 FPS, 10 frames = 2 seconds of relatively stable camera positioning.
+     * Reducing this makes the initial stability check faster.
      */
-    const val STABILITY_WINDOW_SIZE = 10
+    const val STABILITY_WINDOW_SIZE = 5
 
     /**
-     * Maximum allowed normalized histogram variation between consecutive frames (5%).
-     * Lower values require more camera stability before prediction.
+     * Maximum allowed normalized histogram variation between consecutive frames.
+     * Increased from 0.05 to 0.10 to be less sensitive to minor camera shakes.
      */
-    const val STABILITY_THRESHOLD = 0.05
+    const val STABILITY_THRESHOLD = 0.10
 
     /**
      * Relative size of the center crop area (40% of frame dimensions).
@@ -28,17 +28,14 @@ object FrameAnalysisConfig {
     /**
      * Threshold for normalized histogram distance metric: Σ[(a-b)²/(a+b+ε)].
      * Values BELOW this threshold indicate stable frame (minimal scene change).
-     * Lower values = more sensitive to movement = stricter stability requirement.
-     * Typical range: 2000-5000 depending on lighting and camera conditions.
      */
     const val DIFFERENCE_THRESHOLD = 8000.0
 
     /**
      * Time (in milliseconds) the camera must remain stable before triggering prediction.
-     * Provides visual feedback through loading progress indicator.
-     * Balances between quick responsiveness and ensuring frame stability.
+     * Reduced from 1500ms to 800ms for faster response.
      */
-    const val STABILITY_DURATION_MS = 1500L  // 1.5 seconds
+    const val STABILITY_DURATION_MS = 800L
 
     /**
      * Time (in milliseconds) to display prediction result before allowing new capture.
