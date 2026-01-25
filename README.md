@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.png" width="150" alt="InkSight Logo">
+</p>
+
 # InkSight - MNIST Character Recognition Android App
 
 This project is a practical blend of my Android development experience and machine learning studies from the course [The Data Science Course: Complete Data Science Bootcamp 2025](https://www.udemy.com/course/the-data-science-course-complete-data-science-bootcamp), specifically **Module 52**, where we build a character recognition model using TensorFlow 2.0 and the MNIST dataset.
