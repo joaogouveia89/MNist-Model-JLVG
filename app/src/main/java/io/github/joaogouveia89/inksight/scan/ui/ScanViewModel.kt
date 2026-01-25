@@ -44,7 +44,7 @@ class ScanViewModel @Inject constructor(
 
     private val executor = Executors.newSingleThreadExecutor()
 
-    // Constantes e UseCases mantidos como propriedades para o setup da câmera
+    // Constants and UseCases are maintained as properties for the camera setup.
     val cameraSelector: CameraSelector = DEFAULT_BACK_CAMERA
     val maskSize: Float = FrameAnalysisConfig.MASK_SIZE
 
