@@ -7,6 +7,10 @@ import androidx.camera.core.Preview
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -15,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -28,7 +33,8 @@ import io.github.joaogouveia89.inksight.scan.ui.components.ScanContainer
 @Composable
 fun ScanScreen(
     modifier: Modifier = Modifier,
-    viewModel: ScanViewModel
+    viewModel: ScanViewModel,
+    onNavigateToHistory: () -> Unit
 ) {
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
 
@@ -55,6 +61,20 @@ fun ScanScreen(
                 onCorrect = { viewModel.execute(ScanCommand.OnPredictionCorrect) },
                 onIncorrect = { viewModel.execute(ScanCommand.OnPredictionIncorrect) }
             )
+
+            // History Navigation Button
+            IconButton(
+                onClick = onNavigateToHistory,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 40.dp, end = 16.dp) // Adjusted for status bar/safe area
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.History,
+                    contentDescription = "History",
+                    tint = Color.White
+                )
+            }
         } else {
             CameraPermissionScreen(
                 modifier = Modifier.fillMaxSize(),

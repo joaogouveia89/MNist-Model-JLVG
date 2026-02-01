@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -101,6 +102,7 @@ dependencies {
     // Dependency Injection
     implementation(libs.hilt.impl)
     ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Machine Learning
     implementation(libs.tensorflow.lite)
