@@ -1,12 +1,14 @@
 package io.github.joaogouveia89.inksight.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.joaogouveia89.inksight.history.ui.HistoryScreen
+import io.github.joaogouveia89.inksight.scan.ui.ScanCommand
 import io.github.joaogouveia89.inksight.scan.ui.ScanScreen
 import io.github.joaogouveia89.inksight.scan.ui.ScanViewModel
 
@@ -21,6 +23,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     ) {
         composable<NavRoute.Scan> {
             val viewModel: ScanViewModel = hiltViewModel()
+
+            DisposableEffect(Unit) {
+                viewModel.execute(ScanCommand.OnStartScanning)
+                onDispose {
+                    viewModel.execute(ScanCommand.OnStopScanning)
+                }
+            }
+
             ScanScreen(
                 viewModel = viewModel,
                 onNavigateToHistory = { navController.navigate(NavRoute.History) }

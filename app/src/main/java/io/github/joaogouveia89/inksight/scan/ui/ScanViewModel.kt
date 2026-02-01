@@ -35,6 +35,8 @@ sealed interface ScanCommand {
     object DismissError : ScanCommand
     object OnPredictionCorrect : ScanCommand
     object OnPredictionIncorrect : ScanCommand
+    object OnStartScanning : ScanCommand
+    object OnStopScanning : ScanCommand
 }
 
 @HiltViewModel
@@ -47,6 +49,7 @@ class ScanViewModel @Inject constructor(
     val uiState: StateFlow<MNistCheckingUiState> = _uiState.asStateFlow()
 
     private val executor = Executors.newSingleThreadExecutor()
+    private var isScanning = true
 
     // Constants and UseCases are maintained as properties for the camera setup.
     val cameraSelector: CameraSelector = DEFAULT_BACK_CAMERA
@@ -80,7 +83,20 @@ class ScanViewModel @Inject constructor(
             ScanCommand.DismissError -> dismissError()
             ScanCommand.OnPredictionCorrect -> handlePredictionFeedback(true)
             ScanCommand.OnPredictionIncorrect -> handlePredictionFeedback(false)
+            ScanCommand.OnStartScanning -> startScanning()
+            ScanCommand.OnStopScanning -> stopScanning()
         }
+    }
+
+    private fun startScanning() {
+        isScanning = true
+        frameProcessor.reset()
+    }
+
+    private fun stopScanning() {
+        isScanning = false
+        frameProcessor.reset()
+        _uiState.update { it.copy(prediction = null, isLoading = false, loadingProgress = 0f) }
     }
 
     private fun handlePredictionFeedback(isCorrect: Boolean) {
@@ -88,7 +104,6 @@ class ScanViewModel @Inject constructor(
         if (currentPrediction != null) {
             viewModelScope.launch {
                 inferenceRepository.saveInference(currentPrediction, isCorrect)
-                // Opcional: Dar um feedback visual ou resetar a predição atual
             }
         }
     }
@@ -142,6 +157,10 @@ class ScanViewModel @Inject constructor(
 
     @OptIn(ExperimentalGetImage::class)
     private fun analyzeImage(imageProxy: ImageProxy) {
+        if (!isScanning) {
+            imageProxy.close()
+            return
+        }
         try {
             val image = imageProxy.image ?: return
             val plane = image.planes[0]
