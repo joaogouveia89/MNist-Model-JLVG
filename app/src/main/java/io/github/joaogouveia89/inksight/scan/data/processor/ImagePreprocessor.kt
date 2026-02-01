@@ -1,13 +1,14 @@
 package io.github.joaogouveia89.inksight.scan.data.processor
 
 import android.graphics.Bitmap
-import android.graphics.Color
 import androidx.core.graphics.scale
 import io.github.joaogouveia89.inksight.ktx.asByteArray
 import io.github.joaogouveia89.inksight.ktx.crop
 import io.github.joaogouveia89.inksight.scan.data.model.CropMeasurements
 import java.nio.ByteBuffer
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 
 data class ModelInputData(
     val input: Array<FloatArray>,
@@ -32,66 +33,79 @@ class ImagePreprocessor @Inject constructor() {
         targetWidth: Int = 28,
         targetHeight: Int = 28
     ): ModelInputData {
-        val scaledImage = cropped.scale(targetWidth, targetHeight, true)
-        val imageBytes = scaledImage.asByteArray()
-        val pixels = imageBytes.map { (it.toInt() and 0xFF) }
+        // Step 1: Scale to an intermediate resolution to preserve detail during binarization
+        val processingWidth = targetWidth * 4
+        val processingHeight = targetHeight * 4
+        val intermediate = cropped.scale(processingWidth, processingHeight, true)
+        
+        val pixels = intermediate.asByteArray().map { it.toInt() and 0xFF }
+        val binarized = applyAdaptiveThreshold(pixels, processingWidth, processingHeight)
 
-        val threshold = calculateOtsuThreshold(pixels)
+        // Step 2: Create a high-res binarized bitmap to scale it down properly
+        val highResBinarized = Bitmap.createBitmap(processingWidth, processingHeight, Bitmap.Config.ALPHA_8)
+        highResBinarized.copyPixelsFromBuffer(ByteBuffer.wrap(binarized))
 
-        val binarizedPixels = ByteArray(targetWidth * targetHeight)
+        // Step 3: Scale down to model size (28x28). 
+        // Scaling a binarized image creates soft anti-aliased edges which the model likes.
+        val finalBitmap = highResBinarized.scale(targetWidth, targetHeight, true)
+        val finalPixels = finalBitmap.asByteArray().map { it.toInt() and 0xFF }
 
         val input = Array(1) {
             FloatArray(targetWidth * targetHeight) { i ->
-                // MNIST expects high values (1.0) for the stroke and low values (0.0) for the background.
-                // Camera input usually has low values for dark ink and high values for white paper.
-                // We binarize and invert here.
-                if (pixels[i] < threshold) {
-                    binarizedPixels[i] = 255.toByte() // Stroke (White in MNIST)
-                    1.0f
+                // Normalize to 0.0 - 1.0
+                finalPixels[i] / 255.0f
+            }
+        }
+
+        return ModelInputData(input, finalBitmap)
+    }
+
+    /**
+     * Adaptive thresholding (Bradley-Roth algorithm)
+     * Good for handling uneven lighting and shadows.
+     */
+    private fun applyAdaptiveThreshold(
+        pixels: List<Int>,
+        width: Int,
+        height: Int,
+        windowSize: Int = 15,
+        percentage: Int = 15
+    ): ByteArray {
+        val output = ByteArray(pixels.size)
+        val integralImage = IntArray(pixels.size)
+        
+        // Calculate integral image for fast local mean calculation
+        for (i in 0 until width) {
+            var sum = 0
+            for (j in 0 until height) {
+                sum += pixels[j * width + i]
+                integralImage[j * width + i] = if (i == 0) sum else integralImage[j * width + i - 1] + sum
+            }
+        }
+
+        val s2 = windowSize / 2
+        for (i in 0 until width) {
+            for (j in 0 until height) {
+                val x1 = max(i - s2, 0)
+                val x2 = min(i + s2, width - 1)
+                val y1 = max(j - s2, 0)
+                val y2 = min(j + s2, height - 1)
+                
+                val count = (x2 - x1 + 1) * (y2 - y1 + 1)
+                val sum = integralImage[y2 * width + x2] -
+                        (if (x1 > 0) integralImage[y2 * width + x1 - 1] else 0) -
+                        (if (y1 > 0) integralImage[(y1 - 1) * width + x2] else 0) +
+                        (if (x1 > 0 && y1 > 0) integralImage[(y1 - 1) * width + x1 - 1] else 0)
+
+                // If pixel is significantly darker than surrounding mean, it's ink (set to white 255)
+                if (pixels[j * width + i] * 100 < sum * (100 - percentage) / count) {
+                    output[j * width + i] = 255.toByte()
                 } else {
-                    binarizedPixels[i] = 0.toByte()   // Background (Black in MNIST)
-                    0.0f
+                    output[j * width + i] = 0.toByte()
                 }
             }
         }
-
-        val binarizedBitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ALPHA_8)
-        binarizedBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(binarizedPixels))
-
-        return ModelInputData(input, binarizedBitmap)
-    }
-
-    private fun calculateOtsuThreshold(pixels: List<Int>): Int {
-        val histogram = IntArray(256)
-        for (p in pixels) histogram[p]++
-
-        val total = pixels.size
-        var sum = 0.0
-        for (i in 0..255) sum += (i * histogram[i]).toDouble()
-
-        var sumB = 0.0
-        var wB = 0
-        var wF: Int
-        var maxVar = -1.0
-        var threshold = 128
-
-        for (i in 0..255) {
-            wB += histogram[i]
-            if (wB == 0) continue
-            wF = total - wB
-            if (wF == 0) break
-
-            sumB += (i * histogram[i]).toDouble()
-            val mB = sumB / wB
-            val mF = (sum - sumB) / wF
-
-            val varBetween = wB.toDouble() * wF.toDouble() * (mB - mF) * (mB - mF)
-            if (varBetween > maxVar) {
-                maxVar = varBetween
-                threshold = i
-            }
-        }
-        return threshold
+        return output
     }
 
     fun calculateCropMeasurements(
