@@ -75,13 +75,12 @@ fun HistoryScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            AccuracyHeader(accuracyRate = state.accuracyRate)
-
             if (state.isLoading) {
                 LoadingState()
             } else if (state.items.isEmpty()) {
                 EmptyState()
             } else {
+                AccuracyHeader(accuracyRate = state.accuracyRate)
                 HistoryGrid(items = state.items)
             }
         }
