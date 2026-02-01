@@ -40,10 +40,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.joaogouveia89.inksight.R
 import io.github.joaogouveia89.inksight.core.ui.theme.SuccessGreen
 import io.github.joaogouveia89.inksight.core.ui.theme.RedAlert
 import io.github.joaogouveia89.inksight.core.ui.theme.MNistModelAppTheme
@@ -58,12 +60,12 @@ fun HistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Prediction History") },
+                title = { Text(stringResource(R.string.history_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.common_back)
                         )
                     }
                 }
@@ -107,7 +109,7 @@ fun AccuracyHeader(accuracyRate: Float) {
         ) {
             Column {
                 Text(
-                    text = "Overall Accuracy",
+                    text = stringResource(R.string.history_accuracy_label),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -161,7 +163,7 @@ fun HistoryCard(item: HistoryItem) {
                 item.prediction.frame?.let { bitmap ->
                     Image(
                         bitmap = bitmap.asImageBitmap(),
-                        contentDescription = "Predicted Number: ${item.prediction.number}",
+                        contentDescription = stringResource(R.string.history_number_label, item.prediction.number),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -190,7 +192,7 @@ fun HistoryCard(item: HistoryItem) {
                 ) {
                     Icon(
                         imageVector = if (item.isCorrect) Icons.Default.Check else Icons.Default.Close,
-                        contentDescription = if (item.isCorrect) "Correct" else "Incorrect",
+                        contentDescription = if (item.isCorrect) stringResource(R.string.common_correct) else stringResource(R.string.common_incorrect),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(16.dp)
                     )
@@ -204,12 +206,12 @@ fun HistoryCard(item: HistoryItem) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Number: ${item.prediction.number}",
+                        text = stringResource(R.string.history_number_label, item.prediction.number),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }
                 Text(
-                    text = "Confidence: ${item.prediction.confidence}%",
+                    text = stringResource(R.string.common_confidence, item.prediction.confidence),
                     style = MaterialTheme.typography.bodySmall,
                     color = item.prediction.color
                 )
@@ -240,12 +242,12 @@ fun EmptyState() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No history yet",
+            text = stringResource(R.string.history_empty_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.outline
         )
         Text(
-            text = "Your predictions will appear here.",
+            text = stringResource(R.string.history_empty_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.outline
         )

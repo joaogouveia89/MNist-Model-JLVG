@@ -38,8 +38,8 @@ fun CameraPermissionScreen(
     modifier: Modifier = Modifier
 ) {
     val textToShow = if (cameraPermissionState.status.shouldShowRationale)
-        R.string.camera_permission_message_shouldShowRationale
-    else R.string.camera_permission_message_general
+        R.string.permission_camera_rationale
+    else R.string.permission_camera_general
 
     Column(
         modifier = modifier
@@ -53,7 +53,7 @@ fun CameraPermissionScreen(
     ) {
         Icon(
             imageVector = Icons.Default.CameraAlt,
-            contentDescription = "Camera icon",
+            contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(Dimens.iconSizeLarge)
         )
@@ -80,7 +80,7 @@ fun CameraPermissionScreen(
                 contentDescription = null,
                 modifier = Modifier.padding(end = Dimens.iconPaddingEnd)
             )
-            Text(stringResource(R.string.allow_access_to_the_camera))
+            Text(stringResource(R.string.permission_camera_title))
         }
     }
 }
