@@ -7,8 +7,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,6 +44,8 @@ fun PredictionResultBox(
     loadingProgress: Float = 0f,
     isLoading: Boolean = false,
     borderColor: Color = Color.Green,
+    onCorrect: () -> Unit = {},
+    onIncorrect: () -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -50,13 +62,63 @@ fun PredictionResultBox(
             }
             .padding(12.dp)
     ) {
-        prediction?.frame?.let { frame ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                PredictionFrame(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    frame = frame
-                )
-                PredictionResult(prediction)
+        Column {
+            prediction?.frame?.let { frame ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    PredictionFrame(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        frame = frame
+                    )
+                    PredictionResult(
+                        modifier = Modifier.weight(1f),
+                        prediction = prediction
+                    )
+                }
+            }
+
+            if (prediction != null && !isLoading) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilledTonalIconButton(
+                        onClick = onIncorrect,
+                        colors = IconButtonDefaults.filledTonalIconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.4f),
+                            contentColor = Color.Black
+                        ),
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Incorrect",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.width(12.dp))
+                    
+                    FilledTonalIconButton(
+                        onClick = onCorrect,
+                        colors = IconButtonDefaults.filledTonalIconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.7f),
+                            contentColor = Color.Black
+                        ),
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Correct",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
         }
 
@@ -72,22 +134,30 @@ fun PredictionResultBox(
 
 
 @Composable
-private fun PredictionResult(prediction: CharacterPrediction) {
+private fun PredictionResult(
+    modifier: Modifier = Modifier,
+    prediction: CharacterPrediction
+) {
     Column(
-        modifier = Modifier.padding(start = 8.dp),
+        modifier = modifier.padding(start = 12.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(R.string.predictionBoxResult, prediction.number),
+            style = MaterialTheme.typography.titleMedium,
+            color = Color.Black
         )
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(R.string.predictionBoxConfidence, prediction.confidence),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Black.copy(alpha = 0.7f)
             )
             Icon(
-                modifier = Modifier.padding(start = 8.dp),
+                modifier = Modifier.padding(start = 8.dp).size(16.dp),
                 imageVector = prediction.icon,
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.Black.copy(alpha = 0.7f)
             )
         }
     }
@@ -98,13 +168,15 @@ private fun PredictionFrame(
     modifier: Modifier = Modifier,
     frame: Bitmap
 ) {
-    Column(
-        modifier.background(Color.White),
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier
+            .background(Color.White)
+            .padding(2.dp)
     ) {
         Image(
             bitmap = frame.asImageBitmap(),
             contentDescription = null,
+            modifier = Modifier.size(48.dp)
         )
     }
 }
@@ -175,18 +247,6 @@ private fun PredictionResultBoxIdlePreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Loading 50%")
-@Composable
-private fun PredictionResultBoxLoadingPreview() {
-    MNistModelAppTheme {
-        PredictionResultBox(
-            prediction = null,
-            isLoading = true,
-            loadingProgress = 0.5f
-        )
-    }
-}
-
 @Preview(showBackground = true, name = "Prediction High Confidence")
 @Composable
 private fun PredictionResultBoxHighConfidencePreview() {
@@ -201,62 +261,3 @@ private fun PredictionResultBoxHighConfidencePreview() {
         )
     }
 }
-
-@Preview(showBackground = true, name = "Medium Confidence")
-@Composable
-private fun PredictionResultBoxMediumConfidencePreview() {
-    MNistModelAppTheme {
-        PredictionResultBox(
-            prediction = CharacterPrediction(
-                number = 3,
-                confidence = 72,
-                frame = BitmapUtils.createMockBitmap("3")
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Low Confidence")
-@Composable
-private fun PredictionResultBoxLowConfidencePreview() {
-    MNistModelAppTheme {
-        PredictionResultBox(
-            prediction = CharacterPrediction(
-                number = 5,
-                confidence = 45,
-                frame = BitmapUtils.createMockBitmap("5")
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Very Low Confidence")
-@Composable
-private fun PredictionResultBoxVeryLowConfidencePreview() {
-    MNistModelAppTheme {
-        PredictionResultBox(
-            prediction = CharacterPrediction(
-                number = 2,
-                confidence = 28,
-                frame = BitmapUtils.createMockBitmap("2")
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "No Frame")
-@Composable
-private fun PredictionResultBoxNoFramePreview() {
-    MNistModelAppTheme {
-        PredictionResultBox(
-            prediction = CharacterPrediction(
-                number = 9,
-                confidence = 88,
-                frame = null
-            )
-        )
-    }
-}
-
-
-

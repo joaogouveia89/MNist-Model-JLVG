@@ -1,6 +1,7 @@
 package io.github.joaogouveia89.inksight.scan.ui
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
@@ -32,6 +33,8 @@ import javax.inject.Inject
 sealed interface ScanCommand {
     data class OnCameraError(val message: String) : ScanCommand
     object DismissError : ScanCommand
+    object OnPredictionCorrect : ScanCommand
+    object OnPredictionIncorrect : ScanCommand
 }
 
 @HiltViewModel
@@ -74,6 +77,16 @@ class ScanViewModel @Inject constructor(
         when (command) {
             is ScanCommand.OnCameraError -> handleCameraError(command.message)
             ScanCommand.DismissError -> dismissError()
+            ScanCommand.OnPredictionCorrect -> handlePredictionFeedback(true)
+            ScanCommand.OnPredictionIncorrect -> handlePredictionFeedback(false)
+        }
+    }
+
+    private fun handlePredictionFeedback(isCorrect: Boolean) {
+        val currentPrediction = _uiState.value.prediction
+        if (currentPrediction != null) {
+            // TODO: Implement logic to save inference for training
+            Log.d("ScanViewModel", "Feedback for ${currentPrediction.number}: $isCorrect")
         }
     }
 

@@ -51,7 +51,9 @@ fun ScanScreen(
                 cameraPreviewUseCase = viewModel.cameraPreviewUseCase,
                 imageAnalyzer = viewModel.imageAnalyzer,
                 cameraSelector = viewModel.cameraSelector,
-                onCameraError = { error -> viewModel.execute(ScanCommand.OnCameraError(error)) }
+                onCameraError = { error -> viewModel.execute(ScanCommand.OnCameraError(error)) },
+                onCorrect = { viewModel.execute(ScanCommand.OnPredictionCorrect) },
+                onIncorrect = { viewModel.execute(ScanCommand.OnPredictionIncorrect) }
             )
         } else {
             CameraPermissionScreen(
@@ -76,7 +78,9 @@ private fun ScanContent(
     cameraPreviewUseCase: Preview,
     imageAnalyzer: ImageAnalysis,
     cameraSelector: CameraSelector,
-    onCameraError: (String) -> Unit
+    onCameraError: (String) -> Unit,
+    onCorrect: () -> Unit,
+    onIncorrect: () -> Unit
 ) {
     CameraLifecycleManager(
         preview = cameraPreviewUseCase,
@@ -88,6 +92,8 @@ private fun ScanContent(
     ScanContainer(
         modifier = Modifier.fillMaxSize(),
         uiState = uiState,
-        maskSize = maskSize
+        maskSize = maskSize,
+        onCorrect = onCorrect,
+        onIncorrect = onIncorrect
     )
 }

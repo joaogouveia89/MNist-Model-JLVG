@@ -13,7 +13,9 @@ import io.github.joaogouveia89.inksight.scan.ui.MNistCheckingUiState
 fun ScanContainer(
     modifier: Modifier = Modifier,
     uiState: MNistCheckingUiState,
-    maskSize: Float
+    maskSize: Float,
+    onCorrect: () -> Unit = {},
+    onIncorrect: () -> Unit = {},
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (val surfaceRequest = uiState.surfaceRequest) {
@@ -38,7 +40,9 @@ fun ScanContainer(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 prediction = uiState.prediction,
                 isLoading = uiState.isLoading,
-                loadingProgress = uiState.loadingProgress
+                loadingProgress = uiState.loadingProgress,
+                onCorrect = onCorrect,
+                onIncorrect = onIncorrect
             )
         }
     }
