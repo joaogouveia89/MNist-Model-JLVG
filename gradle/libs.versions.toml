@@ -17,6 +17,9 @@ composeBom = "2025.10.01"
 camerax = "1.5.1"
 accompanist = "0.37.3"
 
+# Room
+room = "2.8.4"
+
 # Dependency Injection
 hilt = "2.57.2"
 
@@ -50,6 +53,11 @@ androidx-camera-compose = { group = "androidx.camera", name = "camera-compose", 
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+
+# Room
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 # Dependency Injection
 hilt-impl = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }

@@ -93,6 +93,11 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.accompanist.permissions)
 
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
     // Dependency Injection
     implementation(libs.hilt.impl)
     ksp(libs.hilt.compiler)

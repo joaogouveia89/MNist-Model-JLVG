@@ -1,7 +1,6 @@
 package io.github.joaogouveia89.inksight.scan.ui
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
@@ -17,6 +16,7 @@ import io.github.joaogouveia89.inksight.scan.data.processor.FrameProcessor
 import io.github.joaogouveia89.inksight.scan.domain.CharacterPrediction
 import io.github.joaogouveia89.inksight.scan.domain.FrameAnalysisConfig
 import io.github.joaogouveia89.inksight.scan.domain.FrameProcessorState
+import io.github.joaogouveia89.inksight.scan.domain.repository.InferenceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,7 +39,8 @@ sealed interface ScanCommand {
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
-    private val frameProcessor: FrameProcessor
+    private val frameProcessor: FrameProcessor,
+    private val inferenceRepository: InferenceRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MNistCheckingUiState())
@@ -85,8 +86,10 @@ class ScanViewModel @Inject constructor(
     private fun handlePredictionFeedback(isCorrect: Boolean) {
         val currentPrediction = _uiState.value.prediction
         if (currentPrediction != null) {
-            // TODO: Implement logic to save inference for training
-            Log.d("ScanViewModel", "Feedback for ${currentPrediction.number}: $isCorrect")
+            viewModelScope.launch {
+                inferenceRepository.saveInference(currentPrediction, isCorrect)
+                // Opcional: Dar um feedback visual ou resetar a predição atual
+            }
         }
     }
 
