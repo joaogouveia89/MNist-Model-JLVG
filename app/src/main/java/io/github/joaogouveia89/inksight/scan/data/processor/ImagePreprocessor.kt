@@ -1,15 +1,18 @@
 package io.github.joaogouveia89.inksight.scan.data.processor
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import androidx.core.graphics.scale
 import io.github.joaogouveia89.inksight.ktx.asByteArray
 import io.github.joaogouveia89.inksight.ktx.crop
 import io.github.joaogouveia89.inksight.scan.data.model.CropMeasurements
+import java.nio.ByteBuffer
 import javax.inject.Inject
 
-/*
- * Prepare images for model analysis.
- */
+data class ModelInputData(
+    val input: Array<FloatArray>,
+    val binarizedBitmap: Bitmap
+)
 
 class ImagePreprocessor @Inject constructor() {
 
@@ -28,28 +31,36 @@ class ImagePreprocessor @Inject constructor() {
         cropped: Bitmap,
         targetWidth: Int = 28,
         targetHeight: Int = 28
-    ): Array<FloatArray> {
+    ): ModelInputData {
         val scaledImage = cropped.scale(targetWidth, targetHeight, true)
         val imageBytes = scaledImage.asByteArray()
         val pixels = imageBytes.map { (it.toInt() and 0xFF) }
 
         val threshold = calculateOtsuThreshold(pixels)
 
+        val binarizedPixels = ByteArray(targetWidth * targetHeight)
+
         val input = Array(1) {
             FloatArray(targetWidth * targetHeight) { i ->
-                // Using Otsu's threshold to separate digit from background.
-                // Assuming dark ink (foreground) < threshold.
+                // MNIST expects high values (1.0) for the stroke and low values (0.0) for the background.
+                // Camera input usually has low values for dark ink and high values for white paper.
+                // We binarize and invert here.
                 if (pixels[i] < threshold) {
-                    pixels[i] / 255.0f
-                } else 0f
+                    binarizedPixels[i] = 255.toByte() // Stroke (White in MNIST)
+                    1.0f
+                } else {
+                    binarizedPixels[i] = 0.toByte()   // Background (Black in MNIST)
+                    0.0f
+                }
             }
         }
-        return input
+
+        val binarizedBitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ALPHA_8)
+        binarizedBitmap.copyPixelsFromBuffer(ByteBuffer.wrap(binarizedPixels))
+
+        return ModelInputData(input, binarizedBitmap)
     }
 
-    /**
-     * Implementation of Otsu's Method to find the optimal threshold.
-     */
     private fun calculateOtsuThreshold(pixels: List<Int>): Int {
         val histogram = IntArray(256)
         for (p in pixels) histogram[p]++

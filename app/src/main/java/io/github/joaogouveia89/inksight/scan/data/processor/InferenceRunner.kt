@@ -11,13 +11,13 @@ class InferenceRunner @Inject constructor(
 ) {
 
     fun run(frame: Bitmap): PredictionResult? {
-        val input = imagePreprocessor.preProcessForModel(frame)
-        val prediction = model.predict(input) ?: return null
+        val inputData = imagePreprocessor.preProcessForModel(frame)
+        val prediction = model.predict(inputData.input) ?: return null
 
         return PredictionResult(
             predictedNumber = prediction.predictedClass,
             confidence = prediction.confidence,
-            frame = frame
+            frame = inputData.binarizedBitmap
         )
     }
 
