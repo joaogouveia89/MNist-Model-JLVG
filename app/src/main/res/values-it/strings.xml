@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">InkSight</string>
+
+    <!-- General / Common -->
+    <string name="common_back">Indietro</string>
+    <string name="common_correct">Corretto</string>
+    <string name="common_incorrect">Errato</string>
+    <string name="common_confidence">Confidenza: %1$d%%</string>
+
+    <!-- Permissions -->
+    <string name="permission_camera_title">Consenti l\'accesso alla fotocamera</string>
+    <string name="permission_camera_rationale">Per il corretto funzionamento dell\'app, abbiamo bisogno dell\'accesso alla tua fotocamera.\n\n Verrà utilizzata per acquisire immagini di numeri scritti a mano e riconoscere i caratteri utilizzando il nostro modello di IA.</string>
+    <string name="permission_camera_general">Ciao! 👋\n\nQuesta app utilizza la tua fotocamera per identificare i numeri scritti a mano utilizzando un modello di IA addestrato da noi.\n\n Per iniziare, consenti l\'accesso alla tua fotocamera.</string>
+
+    <!-- Scan Screen -->
+    <string name="scan_prediction_result">Predizione: %1$d</string>
+    <string name="scan_stabilizing">Stabilizzazione...</string>
+    <string name="scan_history_desc">Cronologia</string>
+    <string name="scan_error_processing">Errore di elaborazione: %1$s</string>
+
+    <!-- History Screen -->
+    <string name="history_title">Cronologia Predizioni</string>
+    <string name="history_accuracy_label">Precisione Generale</string>
+    <string name="history_number_label">Numero: %1$d</string>
+    <string name="history_empty_title">Ancora nessuna cronologia</string>
+    <string name="history_empty_subtitle">Le tue predizioni appariranno qui.</string>
+</resources>

@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">InkSight</string>
+
+    <!-- General / Common -->
+    <string name="common_back">Voltar</string>
+    <string name="common_correct">Correto</string>
+    <string name="common_incorrect">Incorreto</string>
+    <string name="common_confidence">Confiança: %1$d%%</string>
+
+    <!-- Permissions -->
+    <string name="permission_camera_title">Permitir acesso à câmera</string>
+    <string name="permission_camera_rationale">Para o app funcionar corretamente, precisamos de acesso à sua câmera.\n\n Ela será usada para capturar imagens de números escritos à mão e reconhecer os caracteres usando nosso modelo de IA.</string>
+    <string name="permission_camera_general">Olá! 👋\n\nEste app usa sua câmera para identificar números escritos à mão usando um modelo de IA treinado por nós.\n\n Para começar, permita o acesso à sua câmera.</string>
+
+    <!-- Scan Screen -->
+    <string name="scan_prediction_result">Predição: %1$d</string>
+    <string name="scan_stabilizing">Estabilizando...</string>
+    <string name="scan_history_desc">Histórico</string>
+    <string name="scan_error_processing">Erro de processamento: %1$s</string>
+
+    <!-- History Screen -->
+    <string name="history_title">Histórico de Predições</string>
+    <string name="history_accuracy_label">Precisão Geral</string>
+    <string name="history_number_label">Número: %1$d</string>
+    <string name="history_empty_title">Nenhum histórico ainda</string>
+    <string name="history_empty_subtitle">Suas predições aparecerão aqui.</string>
+</resources>

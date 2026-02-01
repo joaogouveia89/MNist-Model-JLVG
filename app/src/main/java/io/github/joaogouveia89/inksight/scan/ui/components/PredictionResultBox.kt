@@ -124,7 +124,7 @@ fun PredictionResultBox(
 
         if (isLoading && prediction?.frame == null) {
             Text(
-                text = stringResource(R.string.predictionBoxStabilizing),
+                text = stringResource(R.string.scan_stabilizing),
                 color = Color.Black,
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -143,13 +143,13 @@ private fun PredictionResult(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = stringResource(R.string.predictionBoxResult, prediction.number),
+            text = stringResource(R.string.scan_prediction_result, prediction.number),
             style = MaterialTheme.typography.titleMedium,
             color = Color.Black
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = stringResource(R.string.predictionBoxConfidence, prediction.confidence),
+                text = stringResource(R.string.common_confidence, prediction.confidence),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Black.copy(alpha = 0.7f)
             )
