@@ -2,14 +2,18 @@ package io.github.joaogouveia89.inksight.scan.data.repository
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.github.joaogouveia89.inksight.history.ui.HistoryItem
 import io.github.joaogouveia89.inksight.scan.data.local.InferenceDao
 import io.github.joaogouveia89.inksight.scan.data.local.InferenceEntity
 import io.github.joaogouveia89.inksight.scan.domain.CharacterPrediction
 import io.github.joaogouveia89.inksight.scan.domain.repository.InferenceRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -55,6 +59,23 @@ class InferenceRepositoryImpl @Inject constructor(
                 if (bitmapToSave != originalBitmap) {
                     bitmapToSave.recycle()
                 }
+            }
+        }
+    }
+
+    override fun getAllInferences(): Flow<List<HistoryItem>> {
+        return inferenceDao.getAllInferences().map { entities ->
+            entities.map { entity ->
+                val bitmap = BitmapFactory.decodeFile(entity.imagePath)
+                HistoryItem(
+                    prediction = CharacterPrediction(
+                        number = entity.predictedNumber,
+                        confidence = entity.confidence,
+                        frame = bitmap
+                    ),
+                    isCorrect = entity.isCorrect,
+                    timestamp = entity.timestamp
+                )
             }
         }
     }
