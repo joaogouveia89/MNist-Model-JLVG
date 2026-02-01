@@ -5,15 +5,11 @@ import androidx.core.graphics.scale
 import io.github.joaogouveia89.inksight.ktx.asByteArray
 import io.github.joaogouveia89.inksight.ktx.crop
 import io.github.joaogouveia89.inksight.scan.data.model.CropMeasurements
+import io.github.joaogouveia89.inksight.scan.data.model.ModelInputData
 import java.nio.ByteBuffer
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
-
-data class ModelInputData(
-    val input: Array<FloatArray>,
-    val binarizedBitmap: Bitmap
-)
 
 class ImagePreprocessor @Inject constructor() {
 
