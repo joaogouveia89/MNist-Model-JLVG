@@ -10,7 +10,7 @@ class InferenceRunner @Inject constructor(
     private val model: MnistModel
 ) {
 
-    fun run(frame: Bitmap): PredictionResult? {
+    suspend fun run(frame: Bitmap): PredictionResult? {
         val inputData = imagePreprocessor.preProcessForModel(frame)
         val prediction = model.predict(inputData.input) ?: return null
 
