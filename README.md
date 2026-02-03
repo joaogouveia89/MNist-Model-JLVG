@@ -42,6 +42,16 @@ The use of ReLU activation in the hidden layers enables the model to learn compl
 - Embedded TensorFlow Lite model (trained on MNIST)
 - ViewModel and coroutine-based architecture for clean separation of UI and processing
 
+## Performance & Best Practices Recommendations
+
+To further enhance the application's robustness and efficiency, the following improvements are suggested:
+
+- **Bitmap Pooling**: Implement a pool to reuse `Bitmap` objects during real-time frame processing. This reduces memory allocations and mitigates Garbage Collector (GC) pressure, preventing UI stutters.
+- **Advanced Room Optimization**: For large history sets, integrate `Paging 3` to load inference data lazily. Additionally, ensure all disk I/O and bitmap decoding consistently use `Dispatchers.IO`.
+- **Compose State Stability**: Optimize the `HistoryScreen` by ensuring bitmaps are downsampled to thumbnail sizes before being displayed in the `LazyVerticalGrid` to minimize RAM usage.
+- **Robust Backpressure Handling**: Refine the frame analysis pipeline to drop frames if processing time exceeds the frame interval, ensuring the user always sees the most recent prediction.
+- **Hardware Acceleration**: Explore the use of `GpuDelegate` for TensorFlow Lite to offload inference from the CPU, potentially improving battery life and thermal performance.
+
 ## Screenshots
 
 ![pred1](screenshots/Screenshot_20250711-151303.png)
