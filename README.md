@@ -64,6 +64,15 @@ To further enhance the application's robustness and efficiency, the following im
 4. The model will predict digits from the central area of the frame in real time
 
 ## Project Tags
+
+[v1.1.0](https://github.com/joaogouveia89/InkSight/releases/tag/v1.1.0)
+> This release focuses on significant performance optimizations and major feature additions, including a complete history of predictions.
+Key improvements include:
+- **History Feature**: Implemented a new screen to view past predictions, including the captured image, confidence, and user feedback (correct/incorrect).
+- **Advanced Image Processing**: Refactored the frame processing pipeline to significantly improve image quality before inference. This includes intermediate scaling, adaptive thresholding, and anti-aliasing to preserve stroke integrity.
+- **Coroutine Optimization**: Made the entire processing pipeline asynchronous (`suspend`), offloading heavy CPU and I/O operations to background dispatchers (`Dispatchers.Default` and `Dispatchers.IO`) to ensure a fluid, jank-free UI.
+- **Repository Pattern Enhancement**: Optimized the `InferenceRepository` to handle file and database I/O efficiently on background threads.
+
 [v1.0.0](https://github.com/joaogouveia89/InkSight/releases/tag/v1.0.0)
 > This version represents a significant evolution from the initial proof-of-concept, focusing on architectural robustness and a more refined user experience.
 Key improvements include:
