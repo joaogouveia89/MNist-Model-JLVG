@@ -6,6 +6,8 @@ import io.github.joaogouveia89.inksight.ktx.rotateBitmap
 import io.github.joaogouveia89.inksight.scan.data.model.CropMeasurements
 import io.github.joaogouveia89.inksight.scan.data.model.ProcessedFrame
 import io.github.joaogouveia89.inksight.scan.domain.FrameAnalysisConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FramePipeline @Inject constructor(
@@ -14,7 +16,7 @@ class FramePipeline @Inject constructor(
     private val maskSize: Float = FrameAnalysisConfig.MASK_SIZE
     private var cropMeasurements: CropMeasurements = CropMeasurements()
 
-    fun process(frame: Bitmap): ProcessedFrame {
+    suspend fun process(frame: Bitmap): ProcessedFrame = withContext(Dispatchers.Default) {
         val rotated = frame.rotateBitmap(90f)
 
         if (cropMeasurements.isNotInitialized()) {
@@ -28,7 +30,7 @@ class FramePipeline @Inject constructor(
         val cropped = imagePreprocessor.cropImage(rotated, cropMeasurements)
         val bytes = cropped.asByteArray()
 
-        return ProcessedFrame(
+        ProcessedFrame(
             bitmap = cropped,
             bytes = bytes
         )

@@ -1,8 +1,10 @@
 package io.github.joaogouveia89.inksight.scan.data.processor
 
 import io.github.joaogouveia89.inksight.scan.domain.FrameAnalysisConfig
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.pow
@@ -23,7 +25,7 @@ class HistogramAnalyzer @Inject constructor() {
     // Circular buffer for checking stability.
     private val histogramBuffer = ArrayDeque<IntArray>(stabilityWindowSize)
 
-    fun generateHistogram(data: ByteArray, bins: Int = 64): IntArray {
+    suspend fun generateHistogram(data: ByteArray, bins: Int = 64): IntArray = withContext(Dispatchers.Default) {
         val histogram = IntArray(bins)
         val binSize = 256 / bins
 
@@ -33,7 +35,7 @@ class HistogramAnalyzer @Inject constructor() {
             histogram[binIndex]++
         }
 
-        return histogram
+        histogram
     }
 
     suspend fun isSignificantChange(currentHistogram: IntArray): Boolean {
@@ -54,9 +56,9 @@ class HistogramAnalyzer @Inject constructor() {
     /**
      * Check if the last N frames are stable (little variation between histograms).
      */
-    fun isStable(): Boolean {
+    suspend fun isStable(): Boolean = withContext(Dispatchers.Default) {
         if (histogramBuffer.size < stabilityWindowSize) {
-            return false // We still don't have enough frames.
+            return@withContext false // We still don't have enough frames.
         }
 
         // Compares each pair of consecutive histograms
@@ -67,11 +69,11 @@ class HistogramAnalyzer @Inject constructor() {
             )
 
             if (diff > stabilityThreshold) {
-                return false // Significant variation was found.
+                return@withContext false // Significant variation was found.
             }
         }
 
-        return true // All frames are stable.
+        true // All frames are stable.
     }
 
     /**
