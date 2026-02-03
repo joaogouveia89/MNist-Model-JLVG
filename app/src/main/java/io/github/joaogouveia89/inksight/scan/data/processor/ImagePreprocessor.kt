@@ -12,6 +12,7 @@ import java.nio.ByteBuffer
 import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
+import androidx.core.graphics.createBitmap
 
 class ImagePreprocessor @Inject constructor() {
 
@@ -64,7 +65,7 @@ class ImagePreprocessor @Inject constructor() {
     }
 
     private fun createBinarizedBitmap(pixels: ByteArray, width: Int, height: Int): Bitmap {
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ALPHA_8)
+        val bitmap = createBitmap(width, height, Bitmap.Config.ALPHA_8)
         bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(pixels))
         return bitmap
     }

@@ -13,12 +13,14 @@ import io.github.joaogouveia89.inksight.scan.domain.CharacterPrediction
 import io.github.joaogouveia89.inksight.scan.domain.repository.InferenceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 import javax.inject.Inject
+import androidx.core.graphics.createBitmap
 
 class InferenceRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -29,7 +31,7 @@ class InferenceRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             val originalBitmap = prediction.frame ?: return@withContext
             
-            // Convert ALPHA_8 to ARGB_8888 to ensure compatibility when saving as PNG
+            // Convert ALPHA_8 to ARGB_8888 for PNG compatibility
             val bitmapToSave = if (originalBitmap.config == Bitmap.Config.ALPHA_8) {
                 convertToArgb8888(originalBitmap)
             } else {
@@ -55,7 +57,6 @@ class InferenceRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
-                // If we created a temporary bitmap for conversion, we should clean it up
                 if (bitmapToSave != originalBitmap) {
                     bitmapToSave.recycle()
                 }
@@ -64,31 +65,28 @@ class InferenceRepositoryImpl @Inject constructor(
     }
 
     override fun getAllInferences(): Flow<List<HistoryItem>> {
-        return inferenceDao.getAllInferences().map { entities ->
-            entities.map { entity ->
-                val bitmap = BitmapFactory.decodeFile(entity.imagePath)
-                HistoryItem(
-                    prediction = CharacterPrediction(
-                        number = entity.predictedNumber,
-                        confidence = entity.confidence,
-                        frame = bitmap
-                    ),
-                    isCorrect = entity.isCorrect,
-                    timestamp = entity.timestamp
-                )
+        return inferenceDao.getAllInferences()
+            .map { entities ->
+                entities.map { entity ->
+                    val bitmap = BitmapFactory.decodeFile(entity.imagePath)
+                    HistoryItem(
+                        prediction = CharacterPrediction(
+                            number = entity.predictedNumber,
+                            confidence = entity.confidence,
+                            frame = bitmap
+                        ),
+                        isCorrect = entity.isCorrect,
+                        timestamp = entity.timestamp
+                    )
+                }
             }
-        }
+            .flowOn(Dispatchers.IO) // Ensure decoding and mapping happens on IO thread
     }
 
     private fun convertToArgb8888(alpha8Bitmap: Bitmap): Bitmap {
-        val argbBitmap = Bitmap.createBitmap(
-            alpha8Bitmap.width,
-            alpha8Bitmap.height,
-            Bitmap.Config.ARGB_8888
-        )
+        val argbBitmap = createBitmap(alpha8Bitmap.width, alpha8Bitmap.height)
         val canvas = Canvas(argbBitmap)
         val paint = Paint()
-        // Since ALPHA_8 stores brightness in the alpha channel, we draw it onto a black background
         canvas.drawBitmap(alpha8Bitmap, 0f, 0f, paint)
         return argbBitmap
     }
