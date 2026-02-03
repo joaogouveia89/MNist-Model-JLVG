@@ -1,21 +1,18 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# --- DEBUG SETTINGS ---
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# the log shows the correct line number in code.
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# --- TENSORFLOW LITE ---
+# Ignores warnings about GPU classes that may not be in the classpath
+-dontwarn org.tensorflow.lite.gpu.**
+-keep class org.tensorflow.lite.gpu.** { *; }
+
+# Image processing support (MNIST)
+-dontwarn org.tensorflow.lite.support.**
+-keep class org.tensorflow.lite.support.** { *; }
+
+# Keeps the base TF Lite classes to avoid compilation errors
+-keep class org.tensorflow.lite.** { *; }
