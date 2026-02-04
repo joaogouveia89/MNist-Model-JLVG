@@ -5,12 +5,16 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.guava.await
 
+/**
+ * Manages the CameraX lifecycle within a Composable.
+ * It ensures that the camera is bound/unbound correctly as the lifecycle changes.
+ */
 @Composable
 fun CameraLifecycleManager(
     preview: Preview,
@@ -21,10 +25,12 @@ fun CameraLifecycleManager(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
-    LaunchedEffect(lifecycleOwner) {
+    LaunchedEffect(lifecycleOwner, cameraSelector, preview, imageAnalyzer) {
         try {
             val cameraProvider = ProcessCameraProvider.getInstance(context).await()
 
+            // Always unbind everything before rebinding to prevent "Camera already bound" exceptions
+            // during rapid navigation or configuration changes.
             cameraProvider.unbindAll()
 
             cameraProvider.bindToLifecycle(
@@ -34,18 +40,15 @@ fun CameraLifecycleManager(
                 imageAnalyzer
             )
         } catch (e: Exception) {
+            // If the coroutine was cancelled (e.g., navigated away during initialization),
+            // we should not report an error as it's expected behavior.
+            if (e is CancellationException) throw e
+            
             onError("Failed to initialize camera: ${e.localizedMessage ?: "Unknown error"}")
         }
     }
 
-    // DisposableEffect for cleanup when removed from the composition.
-    DisposableEffect(context) {
-        onDispose {
-            // Try to unbind it safely.
-            // Use runCatching to prevent crashing if CameraProvider has not been initialized.
-            runCatching {
-                ProcessCameraProvider.getInstance(context).get()?.unbindAll()
-            }
-        }
-    }
+    // Note: Manual unbindAll() in DisposableEffect is removed.
+    // bindToLifecycle automatically unbinds when the lifecycleOwner (LocalLifecycleOwner) 
+    // is destroyed or removed from the composition, which is safer for a Singleton provider.
 }
