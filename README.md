@@ -65,6 +65,12 @@ To further enhance the application's robustness and efficiency, the following im
 
 ## Project Tags
 
+[v1.1.1](https://github.com/joaogouveia89/InkSight/releases/tag/v1.1.1)
+> This version introduces Firebase integration for improved app monitoring and crash reporting.
+Key improvements include:
+- **Firebase Integration**: Successfully integrated Firebase Analytics and Crashlytics for real-time monitoring and crash tracking.
+- **Public Repo Readiness**: Configured `google-services.json` security with `.gitignore` and provided a template for public distribution.
+
 [v1.1.0](https://github.com/joaogouveia89/InkSight/releases/tag/v1.1.0)
 > This release focuses on significant performance optimizations and major feature additions, including a complete history of predictions.
 Key improvements include:
