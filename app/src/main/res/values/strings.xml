@@ -24,4 +24,25 @@
     <string name="history_number_label">Number: %1$d</string>
     <string name="history_empty_title">No history yet</string>
     <string name="history_empty_subtitle">Your predictions will appear here.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_dont_show_again">Don\'t show this again</string>
+
+    <string name="onboarding_page1_title">Welcome to InkSight</string>
+    <string name="onboarding_page1_version">Version %1$s</string>
+    <string name="onboarding_page1_description">InkSight is an experimental application that uses an on-device TensorFlow Lite model to recognize handwritten digits.</string>
+
+    <string name="onboarding_page2_title">Real-time Detection</string>
+    <string name="onboarding_page2_description">Point your camera at a handwritten digit (0-9). The app will process the central area of your screen in real time.</string>
+
+    <string name="onboarding_page3_title">How it Works</string>
+    <string name="onboarding_page3_description1">The captured frame is cropped, converted to grayscale, and resized to 28x28 pixels to match the MNIST dataset format used during training.</string>
+    <string name="onboarding_page3_description2">The model was trained locally using TensorFlow 2.0 to ensure fast and private inference on your device.</string>
+
+    <string name="onboarding_page4_title">Ready to start?</string>
+    <string name="onboarding_page4_description1">For best results, ensure good lighting and draw digits clearly on a plain background.</string>
+    <string name="onboarding_page4_description2">You can always re-enable this tutorial in the settings.</string>
 </resources>

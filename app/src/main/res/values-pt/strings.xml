@@ -24,4 +24,25 @@
     <string name="history_number_label">Número: %1$d</string>
     <string name="history_empty_title">Nenhum histórico ainda</string>
     <string name="history_empty_subtitle">Suas predições aparecerão aqui.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Pular</string>
+    <string name="onboarding_next">Próximo</string>
+    <string name="onboarding_get_started">Começar</string>
+    <string name="onboarding_dont_show_again">Não mostrar novamente</string>
+
+    <string name="onboarding_page1_title">Bem-vindo ao InkSight</string>
+    <string name="onboarding_page1_version">Versão %1$s</string>
+    <string name="onboarding_page1_description">InkSight é um aplicativo experimental que usa um modelo TensorFlow Lite no dispositivo para reconhecer dígitos escritos à mão.</string>
+
+    <string name="onboarding_page2_title">Detecção em Tempo Real</string>
+    <string name="onboarding_page2_description">Aponte sua câmera para um dígito escrito à mão (0-9). O aplicativo processará a área central da tela em tempo real.</string>
+
+    <string name="onboarding_page3_title">Como Funciona</string>
+    <string name="onboarding_page3_description1">O quadro capturado é cortado, convertido para escala de cinza e redimensionado para 28x28 pixels para corresponder ao formato do conjunto de dados MNIST usado durante o treinamento.</string>
+    <string name="onboarding_page3_description2">O modelo foi treinado localmente usando TensorFlow 2.0 para garantir inferência rápida e privada no seu dispositivo.</string>
+
+    <string name="onboarding_page4_title">Pronto para começar?</string>
+    <string name="onboarding_page4_description1">Para melhores resultados, garanta uma boa iluminação e desenhe os dígitos claramente em um fundo liso.</string>
+    <string name="onboarding_page4_description2">Você sempre pode reativar este tutorial nas configurações.</string>
 </resources>

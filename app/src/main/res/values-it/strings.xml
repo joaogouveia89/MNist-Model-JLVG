@@ -24,4 +24,25 @@
     <string name="history_number_label">Numero: %1$d</string>
     <string name="history_empty_title">Ancora nessuna cronologia</string>
     <string name="history_empty_subtitle">Le tue predizioni appariranno qui.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Salta</string>
+    <string name="onboarding_next">Avanti</string>
+    <string name="onboarding_get_started">Inizia</string>
+    <string name="onboarding_dont_show_again">Non mostrare più</string>
+
+    <string name="onboarding_page1_title">Benvenuto in InkSight</string>
+    <string name="onboarding_page1_version">Versione %1$s</string>
+    <string name="onboarding_page1_description">InkSight è un\'applicazione sperimentale che utilizza un modello TensorFlow Lite sul dispositivo per riconoscere le cifre scritte a mano.</string>
+
+    <string name="onboarding_page2_title">Rilevamento in Tempo Reale</string>
+    <string name="onboarding_page2_description">Punta la fotocamera verso una cifra scritta a mano (0-9). L\'app elaborerà l\'area centrale dello schermo in tempo reale.</string>
+
+    <string name="onboarding_page3_title">Come Funziona</string>
+    <string name="onboarding_page3_description1">Il fotogramma acquisito viene ritagliato, convertito in scala di grigi e ridimensionato a 28x28 pixel per corrispondere al formato del dataset MNIST utilizzato durante l\'addestramento.</string>
+    <string name="onboarding_page3_description2">Il modello è stato addestrato localmente utilizzando TensorFlow 2.0 per garantire un\'inferenza rapida e privata sul tuo dispositivo.</string>
+
+    <string name="onboarding_page4_title">Pronto per iniziare?</string>
+    <string name="onboarding_page4_description1">Per risultati ottimali, assicura una buona illuminazione e scrivi le cifre chiaramente su uno sfondo semplice.</string>
+    <string name="onboarding_page4_description2">Puoi sempre riattivare questo tutorial nelle impostazioni.</string>
 </resources>
