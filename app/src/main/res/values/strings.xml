@@ -14,9 +14,10 @@
 
     <!-- Scan Screen -->
     <string name="scan_prediction_result">Prediction: %1$d</string>
-    <string name="scan_stabilizing">Stabilizing…</string>
+    <string name="scan_stabilizing">Stabilizing...</string>
     <string name="scan_history_desc">History</string>
     <string name="scan_error_processing">Processing error: %1$s</string>
+    <string name="scan_position_guidance">Position the digit here</string>
 
     <!-- History Screen -->
     <string name="history_title">Prediction History</string>
@@ -36,7 +37,7 @@
     <string name="onboarding_page1_description">InkSight is an experimental application that uses an on-device TensorFlow Lite model to recognize handwritten digits.</string>
 
     <string name="onboarding_page2_title">Real-time Detection</string>
-    <string name="onboarding_page2_description">Point your camera at a handwritten digit (0–9). The app will process the central area of your screen in real time.</string>
+    <string name="onboarding_page2_description">Point your camera at a handwritten digit (0-9). The app will process the central area of your screen in real time.</string>
 
     <string name="onboarding_page3_title">How it Works</string>
     <string name="onboarding_page3_description1">The captured frame is cropped, converted to grayscale, and resized to 28x28 pixels to match the MNIST dataset format used during training.</string>

@@ -10,13 +10,14 @@
     <!-- Permissions -->
     <string name="permission_camera_title">Consenti l\'accesso alla fotocamera</string>
     <string name="permission_camera_rationale">Per il corretto funzionamento dell\'app, abbiamo bisogno dell\'accesso alla tua fotocamera.\n\n Verrà utilizzata per acquisire immagini di numeri scritti a mano e riconoscere i caratteri utilizzando il nostro modello di IA.</string>
-    <string name="permission_camera_general">Ciao! 👋\n\nQuesta app utilizza la tua fotocamera per identificare i numeri scritti a mano utilizzando un modello di IA addestrato da noi.\n\n Per iniziare, consenti l\'accesso alla tua fotocamera.</string>
+    <string name="permission_camera_general">Ciao! 👋\n\nQuesta app utilizza la tua fotocamera per identificar i numeri scritti a mano utilizzando un modello di IA addestrato da noi.\n\n Per iniziare, consenti l\'accesso alla tua fotocamera.</string>
 
     <!-- Scan Screen -->
     <string name="scan_prediction_result">Predizione: %1$d</string>
-    <string name="scan_stabilizing">Stabilizzazione…</string>
+    <string name="scan_stabilizing">Stabilizzazione...</string>
     <string name="scan_history_desc">Cronologia</string>
     <string name="scan_error_processing">Errore di elaborazione: %1$s</string>
+    <string name="scan_position_guidance">Posiziona qui la cifra</string>
 
     <!-- History Screen -->
     <string name="history_title">Cronologia Predizioni</string>
@@ -33,10 +34,10 @@
 
     <string name="onboarding_page1_title">Benvenuto in InkSight</string>
     <string name="onboarding_page1_version">Versione %1$s</string>
-    <string name="onboarding_page1_description">InkSight è un\'applicazione sperimentale che utilizza un modello TensorFlow Lite sul dispositivo per riconoscere le cifre scritte a mano.</string>
+    <string name="onboarding_page1_description">InkSight è un\'applicazione sperimentale che utiliza un modello TensorFlow Lite sul dispositivo per riconoscere le cifre scritte a mano.</string>
 
     <string name="onboarding_page2_title">Rilevamento in Tempo Reale</string>
-    <string name="onboarding_page2_description">Punta la fotocamera verso una cifra scritta a mano (0–9). L\'app elaborerà l\'area centrale dello schermo in tempo reale.</string>
+    <string name="onboarding_page2_description">Punta la fotocamera verso una cifra scritta a mano (0-9). L\'app elaborerà l\'area centrale dello schermo in tempo reale.</string>
 
     <string name="onboarding_page3_title">Come Funziona</string>
     <string name="onboarding_page3_description1">Il fotogramma acquisito viene ritagliato, convertito in scala di grigi e ridimensionato a 28x28 pixel per corrispondere al formato del dataset MNIST utilizzato durante l\'addestramento.</string>
