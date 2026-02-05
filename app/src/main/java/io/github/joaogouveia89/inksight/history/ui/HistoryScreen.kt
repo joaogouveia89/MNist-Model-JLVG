@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.joaogouveia89.inksight.R
 import io.github.joaogouveia89.inksight.core.ui.theme.SuccessGreen
-import io.github.joaogouveia89.inksight.core.ui.theme.RedAlert
+import io.github.joaogouveia89.inksight.core.ui.theme.ErrorRed
 import io.github.joaogouveia89.inksight.core.ui.theme.MNistModelAppTheme
 import io.github.joaogouveia89.inksight.scan.domain.CharacterPrediction
 
@@ -185,7 +185,7 @@ fun HistoryCard(item: HistoryItem) {
                         .padding(8.dp)
                         .size(24.dp)
                         .background(
-                            color = if (item.isCorrect) SuccessGreen else RedAlert,
+                            color = if (item.isCorrect) SuccessGreen else ErrorRed,
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
