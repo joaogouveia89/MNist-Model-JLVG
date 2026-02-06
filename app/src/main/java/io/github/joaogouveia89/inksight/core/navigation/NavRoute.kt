@@ -7,7 +7,7 @@ sealed interface NavRoute {
     data object Onboarding : NavRoute
 
     @Serializable
-    data object Scan : NavRoute
+    data object DigitRecognition : NavRoute
 
     @Serializable
     data object History : NavRoute

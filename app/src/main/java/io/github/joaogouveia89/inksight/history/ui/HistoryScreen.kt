@@ -49,7 +49,7 @@ import io.github.joaogouveia89.inksight.R
 import io.github.joaogouveia89.inksight.core.ui.theme.SuccessGreen
 import io.github.joaogouveia89.inksight.core.ui.theme.ErrorRed
 import io.github.joaogouveia89.inksight.core.ui.theme.MNistModelAppTheme
-import io.github.joaogouveia89.inksight.scan.domain.CharacterPrediction
+import io.github.joaogouveia89.inksight.digit_recognition.domain.CharacterPrediction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

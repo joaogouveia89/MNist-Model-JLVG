@@ -12,12 +12,12 @@
     <string name="permission_camera_rationale">For the app to work properly, we need access to your camera.\n\n It will be used to capture images of handwritten numbers and recognize the characters using our AI model.</string>
     <string name="permission_camera_general">Hello! 👋\n\nThis app uses your camera to identify handwritten numbers using an AI model trained by us.\n\n To get started, please allow access to your camera.</string>
 
-    <!-- Scan Screen -->
-    <string name="scan_prediction_result">Prediction: %1$d</string>
-    <string name="scan_stabilizing">Stabilizing...</string>
-    <string name="scan_history_desc">History</string>
-    <string name="scan_error_processing">Processing error: %1$s</string>
-    <string name="scan_position_guidance">Position the digit here</string>
+    <!-- Digit Recognition Screen -->
+    <string name="digit_recognition_prediction_result">Prediction: %1$d</string>
+    <string name="digit_recognition_stabilizing">Stabilizing...</string>
+    <string name="digit_recognition_history_desc">History</string>
+    <string name="digit_recognition_error_processing">Processing error: %1$s</string>
+    <string name="digit_recognition_position_guidance">Position the digit here</string>
 
     <!-- History Screen -->
     <string name="history_title">Prediction History</string>

@@ -12,12 +12,12 @@
     <string name="permission_camera_rationale">Per il corretto funzionamento dell\'app, abbiamo bisogno dell\'accesso alla tua fotocamera.\n\n Verrà utilizzata per acquisire immagini di numeri scritti a mano e riconoscere i caratteri utilizzando il nostro modello di IA.</string>
     <string name="permission_camera_general">Ciao! 👋\n\nQuesta app utilizza la tua fotocamera per identificar i numeri scritti a mano utilizzando un modello di IA addestrato da noi.\n\n Per iniziare, consenti l\'accesso alla tua fotocamera.</string>
 
-    <!-- Scan Screen -->
-    <string name="scan_prediction_result">Predizione: %1$d</string>
-    <string name="scan_stabilizing">Stabilizzazione...</string>
-    <string name="scan_history_desc">Cronologia</string>
-    <string name="scan_error_processing">Errore di elaborazione: %1$s</string>
-    <string name="scan_position_guidance">Posiziona qui la cifra</string>
+    <!-- Digit Recognition Screen -->
+    <string name="digit_recognition_prediction_result">Predizione: %1$d</string>
+    <string name="digit_recognition_stabilizing">Stabilizzazione...</string>
+    <string name="digit_recognition_history_desc">Cronologia</string>
+    <string name="digit_recognition_error_processing">Errore di elaborazione: %1$s</string>
+    <string name="digit_recognition_position_guidance">Posiziona qui la cifra</string>
 
     <!-- History Screen -->
     <string name="history_title">Cronologia Predizioni</string>

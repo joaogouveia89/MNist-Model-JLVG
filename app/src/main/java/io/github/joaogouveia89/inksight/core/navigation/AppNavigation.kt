@@ -11,9 +11,9 @@ import io.github.joaogouveia89.inksight.history.ui.HistoryScreen
 import io.github.joaogouveia89.inksight.history.ui.HistoryViewModel
 import io.github.joaogouveia89.inksight.onboarding.ui.OnboardingScreen
 import io.github.joaogouveia89.inksight.onboarding.ui.OnboardingViewModel
-import io.github.joaogouveia89.inksight.scan.ui.ScanCommand
-import io.github.joaogouveia89.inksight.scan.ui.ScanScreen
-import io.github.joaogouveia89.inksight.scan.ui.ScanViewModel
+import io.github.joaogouveia89.inksight.digit_recognition.ui.DigitRecognitionCommand
+import io.github.joaogouveia89.inksight.digit_recognition.ui.DigitRecognitionScreen
+import io.github.joaogouveia89.inksight.digit_recognition.ui.DigitRecognitionViewModel
 
 @Composable
 fun AppNavigation(
@@ -29,30 +29,30 @@ fun AppNavigation(
 
     NavHost(
         navController = navController,
-        startDestination = if (showOnboarding == true) NavRoute.Onboarding else NavRoute.Scan,
+        startDestination = if (showOnboarding == true) NavRoute.Onboarding else NavRoute.DigitRecognition,
         modifier = modifier
     ) {
         composable<NavRoute.Onboarding> {
             OnboardingScreen(
                 onFinish = { showAgain ->
                     onboardingViewModel.completeOnboarding(showAgain)
-                    navController.navigate(NavRoute.Scan) {
+                    navController.navigate(NavRoute.DigitRecognition) {
                         popUpTo(NavRoute.Onboarding) { inclusive = true }
                     }
                 }
             )
         }
-        composable<NavRoute.Scan> {
-            val viewModel: ScanViewModel = hiltViewModel()
+        composable<NavRoute.DigitRecognition> {
+            val viewModel: DigitRecognitionViewModel = hiltViewModel()
 
             DisposableEffect(Unit) {
-                viewModel.execute(ScanCommand.OnStartScanning)
+                viewModel.execute(DigitRecognitionCommand.OnStartScanning)
                 onDispose {
-                    viewModel.execute(ScanCommand.OnStopScanning)
+                    viewModel.execute(DigitRecognitionCommand.OnStopScanning)
                 }
             }
 
-            ScanScreen(
+            DigitRecognitionScreen(
                 viewModel = viewModel,
                 onNavigateToHistory = { navController.navigate(NavRoute.History) }
             )

@@ -1,6 +1,6 @@
 package io.github.joaogouveia89.inksight.history.ui
 
-import io.github.joaogouveia89.inksight.scan.domain.CharacterPrediction
+import io.github.joaogouveia89.inksight.digit_recognition.domain.CharacterPrediction
 
 data class HistoryItem(
     val prediction: CharacterPrediction,
