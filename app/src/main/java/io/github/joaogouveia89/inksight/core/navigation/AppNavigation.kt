@@ -7,25 +7,25 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.github.joaogouveia89.inksight.core.data.local.OnboardingPreferences
-import io.github.joaogouveia89.inksight.core.ui.components.OnboardingScreen
 import io.github.joaogouveia89.inksight.history.ui.HistoryScreen
 import io.github.joaogouveia89.inksight.history.ui.HistoryViewModel
+import io.github.joaogouveia89.inksight.onboarding.ui.OnboardingScreen
+import io.github.joaogouveia89.inksight.onboarding.ui.OnboardingViewModel
 import io.github.joaogouveia89.inksight.scan.ui.ScanCommand
 import io.github.joaogouveia89.inksight.scan.ui.ScanScreen
 import io.github.joaogouveia89.inksight.scan.ui.ScanViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation(
-    modifier: Modifier = Modifier,
-    onboardingPreferences: OnboardingPreferences // Idealmente injetado via ViewModel, mas para simplicidade aqui
+    modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
-    val showOnboarding by onboardingPreferences.showOnboarding.collectAsState(initial = null)
-    val scope = rememberCoroutineScope()
 
-    if (showOnboarding == null) return // Aguarda carregar as preferências
+    val onboardingViewModel: OnboardingViewModel = hiltViewModel()
+    val showOnboarding by onboardingViewModel.showOnboarding.collectAsStateWithLifecycle()
+
+    // Wait for the preferences to load before rendering the NavHost
+    if (showOnboarding == null) return
 
     NavHost(
         navController = navController,
@@ -35,11 +35,9 @@ fun AppNavigation(
         composable<NavRoute.Onboarding> {
             OnboardingScreen(
                 onFinish = { showAgain ->
-                    scope.launch {
-                        onboardingPreferences.setShowOnboarding(showAgain)
-                        navController.navigate(NavRoute.Scan) {
-                            popUpTo(NavRoute.Onboarding) { inclusive = true }
-                        }
+                    onboardingViewModel.completeOnboarding(showAgain)
+                    navController.navigate(NavRoute.Scan) {
+                        popUpTo(NavRoute.Onboarding) { inclusive = true }
                     }
                 }
             )
