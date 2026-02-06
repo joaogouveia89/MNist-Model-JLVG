@@ -7,8 +7,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import io.github.joaogouveia89.inksight.digit_recognition.data.local.AppDatabase
-import io.github.joaogouveia89.inksight.digit_recognition.data.local.InferenceDao
+import io.github.joaogouveia89.inksight.core.data.local.AppDatabase
+import io.github.joaogouveia89.inksight.core.data.local.InferenceDao
 import javax.inject.Singleton
 
 @Module

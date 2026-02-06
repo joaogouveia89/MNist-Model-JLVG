@@ -3,7 +3,7 @@ package io.github.joaogouveia89.inksight.history.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.joaogouveia89.inksight.digit_recognition.domain.repository.DigitRecognitionRepository
+import io.github.joaogouveia89.inksight.history.domain.repository.HistoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val digitRecognitionRepository: DigitRecognitionRepository
+    private val historyRepository: HistoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState(isLoading = true))
@@ -27,7 +27,7 @@ class HistoryViewModel @Inject constructor(
 
     private fun loadHistory() {
         viewModelScope.launch {
-            digitRecognitionRepository.getAllInferences()
+            historyRepository.getAllInferences()
                 .onStart {
                     _uiState.update { it.copy(isLoading = true) }
                 }

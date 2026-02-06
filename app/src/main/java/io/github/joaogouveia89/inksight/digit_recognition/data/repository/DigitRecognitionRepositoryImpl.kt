@@ -2,19 +2,14 @@ package io.github.joaogouveia89.inksight.digit_recognition.data.repository
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.github.joaogouveia89.inksight.history.ui.HistoryItem
-import io.github.joaogouveia89.inksight.digit_recognition.data.local.InferenceDao
-import io.github.joaogouveia89.inksight.digit_recognition.data.local.InferenceEntity
+import io.github.joaogouveia89.inksight.core.data.local.InferenceDao
+import io.github.joaogouveia89.inksight.core.data.local.InferenceEntity
 import io.github.joaogouveia89.inksight.digit_recognition.domain.CharacterPrediction
 import io.github.joaogouveia89.inksight.digit_recognition.domain.repository.DigitRecognitionRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -62,25 +57,6 @@ class DigitRecognitionRepositoryImpl @Inject constructor(
                 }
             }
         }
-    }
-
-    override fun getAllInferences(): Flow<List<HistoryItem>> {
-        return inferenceDao.getAllInferences()
-            .map { entities ->
-                entities.map { entity ->
-                    val bitmap = BitmapFactory.decodeFile(entity.imagePath)
-                    HistoryItem(
-                        prediction = CharacterPrediction(
-                            number = entity.predictedNumber,
-                            confidence = entity.confidence,
-                            frame = bitmap
-                        ),
-                        isCorrect = entity.isCorrect,
-                        timestamp = entity.timestamp
-                    )
-                }
-            }
-            .flowOn(Dispatchers.IO) // Ensure decoding and mapping happens on IO thread
     }
 
     private fun convertToArgb8888(alpha8Bitmap: Bitmap): Bitmap {

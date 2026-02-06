@@ -38,6 +38,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -49,7 +50,7 @@ import io.github.joaogouveia89.inksight.R
 import io.github.joaogouveia89.inksight.core.ui.theme.SuccessGreen
 import io.github.joaogouveia89.inksight.core.ui.theme.ErrorRed
 import io.github.joaogouveia89.inksight.core.ui.theme.MNistModelAppTheme
-import io.github.joaogouveia89.inksight.digit_recognition.domain.CharacterPrediction
+import io.github.joaogouveia89.inksight.history.domain.model.HistoryItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -160,10 +161,10 @@ fun HistoryCard(item: HistoryItem) {
                     .aspectRatio(1f)
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                item.prediction.frame?.let { bitmap ->
+                item.image?.let { bitmap ->
                     Image(
                         bitmap = bitmap.asImageBitmap(),
-                        contentDescription = stringResource(R.string.history_number_label, item.prediction.number),
+                        contentDescription = stringResource(R.string.history_number_label, item.predictedNumber),
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -172,7 +173,7 @@ fun HistoryCard(item: HistoryItem) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = item.prediction.number.toString(),
+                        text = item.predictedNumber.toString(),
                         style = MaterialTheme.typography.displayLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                     )
@@ -206,17 +207,27 @@ fun HistoryCard(item: HistoryItem) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(R.string.history_number_label, item.prediction.number),
+                        text = stringResource(R.string.history_number_label, item.predictedNumber),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 }
                 Text(
-                    text = stringResource(R.string.common_confidence, item.prediction.confidence),
+                    text = stringResource(R.string.common_confidence, item.confidence),
                     style = MaterialTheme.typography.bodySmall,
-                    color = item.prediction.color
+                    color = getConfidenceColor(item.confidence)
                 )
             }
         }
+    }
+}
+
+// Helper to replace the missing color property from CharacterPrediction
+@Composable
+private fun getConfidenceColor(confidence: Int): Color {
+    return when {
+        confidence >= 70 -> SuccessGreen
+        confidence >= 40 -> Color(0xFFFFA500) // Orange
+        else -> ErrorRed
     }
 }
 
@@ -262,22 +273,30 @@ fun HistoryScreenPreview() {
             state = HistoryUiState(
                 items = listOf(
                     HistoryItem(
-                        prediction = CharacterPrediction(5, 98, null),
+                        predictedNumber = 5,
+                        confidence = 98,
+                        image = null,
                         isCorrect = true,
                         timestamp = System.currentTimeMillis()
                     ),
                     HistoryItem(
-                        prediction = CharacterPrediction(3, 45, null),
+                        predictedNumber = 3,
+                        confidence = 45,
+                        image = null,
                         isCorrect = false,
                         timestamp = System.currentTimeMillis()
                     ),
                     HistoryItem(
-                        prediction = CharacterPrediction(8, 75, null),
+                        predictedNumber = 8,
+                        confidence = 75,
+                        image = null,
                         isCorrect = true,
                         timestamp = System.currentTimeMillis()
                     ),
                     HistoryItem(
-                        prediction = CharacterPrediction(1, 92, null),
+                        predictedNumber = 1,
+                        confidence = 92,
+                        image = null,
                         isCorrect = true,
                         timestamp = System.currentTimeMillis()
                     )
