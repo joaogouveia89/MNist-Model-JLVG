@@ -65,6 +65,15 @@ To further enhance the application's robustness and efficiency, the following im
 
 ## Project Tags
 
+[v1.2.0](https://github.com/joaogouveia89/InkSight/releases/tag/v1.2.0)
+> This version brings significant architectural refactoring, UI standardization, and improved code maintainability.
+Key improvements include:
+- **Modular Refactoring**: Decoupled `history` and `digit_recognition` modules, moving shared persistence to `core.data.local` and implementing independent repositories.
+- **Onboarding Modularization**: Completely restructured the onboarding flow using a dynamic `enum` and dedicated composable components for each page with Compose Previews.
+- **UI Standardization**: Implemented a semantic spacing scale (Design Tokens) using `CompositionLocal` and `MaterialTheme` extension, ensuring consistent paddings and spacings across the entire app.
+- **Layout Robustness**: Replaced manual coordinate calculations in the camera overlay with a declarative proportional layout using weights and aspect ratio.
+- **Feature Renaming**: Standardized terminology from "Scanning" to "Digit Recognition" for better domain alignment.
+
 [v1.1.1](https://github.com/joaogouveia89/InkSight/releases/tag/v1.1.1)
 > This version introduces Firebase integration for improved app monitoring and crash reporting.
 Key improvements include:
