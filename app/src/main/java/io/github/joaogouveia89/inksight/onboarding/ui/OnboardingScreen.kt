@@ -32,15 +32,19 @@ import io.github.joaogouveia89.inksight.onboarding.ui.components.OnboardingCamer
 import io.github.joaogouveia89.inksight.onboarding.ui.components.OnboardingHistoryPage
 import io.github.joaogouveia89.inksight.onboarding.ui.components.OnboardingReadyPage
 import io.github.joaogouveia89.inksight.onboarding.ui.components.OnboardingWelcomePage
+import io.github.joaogouveia89.inksight.onboarding.ui.model.OnboardingPage
 import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingScreen(
     onFinish: (showAgain: Boolean) -> Unit
 ) {
-    val pagerState = rememberPagerState(pageCount = { 4 })
+    val pages = OnboardingPage.entries
+    val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     var showAgain by remember { mutableStateOf(true) }
+
+    val isLastPage = pagerState.currentPage == pages.size - 1
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -62,12 +66,12 @@ fun OnboardingScreen(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
-            ) { page ->
-                when (page) {
-                    0 -> OnboardingWelcomePage()
-                    1 -> OnboardingCameraPage()
-                    2 -> OnboardingHistoryPage()
-                    3 -> OnboardingReadyPage()
+            ) { pageIndex ->
+                when (pages[pageIndex]) {
+                    OnboardingPage.WELCOME -> OnboardingWelcomePage()
+                    OnboardingPage.CAMERA -> OnboardingCameraPage()
+                    OnboardingPage.HISTORY -> OnboardingHistoryPage()
+                    OnboardingPage.READY -> OnboardingReadyPage()
                 }
             }
 
@@ -78,7 +82,7 @@ fun OnboardingScreen(
                     .padding(MaterialTheme.spacing.large),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (pagerState.currentPage == 3) {
+                if (isLastPage) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(bottom = MaterialTheme.spacing.medium)
@@ -96,7 +100,7 @@ fun OnboardingScreen(
 
                 Button(
                     onClick = {
-                        if (pagerState.currentPage < 3) {
+                        if (!isLastPage) {
                             scope.launch {
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
@@ -107,12 +111,12 @@ fun OnboardingScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        if (pagerState.currentPage == 3)
+                        if (isLastPage)
                             stringResource(R.string.onboarding_get_started)
                         else
                             stringResource(R.string.onboarding_next)
                     )
-                    if (pagerState.currentPage < 3) {
+                    if (!isLastPage) {
                         Icon(Icons.Default.ChevronRight, contentDescription = null)
                     }
                 }
