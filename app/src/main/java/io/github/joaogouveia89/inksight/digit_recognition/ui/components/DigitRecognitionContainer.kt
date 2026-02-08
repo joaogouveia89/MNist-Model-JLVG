@@ -18,8 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import io.github.joaogouveia89.inksight.R
+import io.github.joaogouveia89.inksight.core.ui.theme.spacing
 import io.github.joaogouveia89.inksight.digit_recognition.ui.DigitRecognitionUiState
 
 @Composable
@@ -65,8 +65,8 @@ fun DigitRecognitionContainer(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .padding(bottom = 16.dp) // Fixed gap between text and mask
+                        .padding(horizontal = MaterialTheme.spacing.large)
+                        .padding(bottom = MaterialTheme.spacing.medium) // Fixed gap between text and mask
                 )
             }
 

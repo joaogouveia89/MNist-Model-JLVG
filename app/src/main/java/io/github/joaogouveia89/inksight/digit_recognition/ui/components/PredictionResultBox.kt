@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.joaogouveia89.inksight.R
 import io.github.joaogouveia89.inksight.core.ui.theme.MNistModelAppTheme
+import io.github.joaogouveia89.inksight.core.ui.theme.spacing
 import io.github.joaogouveia89.inksight.helpers.BitmapUtils
 import io.github.joaogouveia89.inksight.digit_recognition.domain.CharacterPrediction
 
@@ -60,7 +61,7 @@ fun PredictionResultBox(
                     )
                 }
             }
-            .padding(12.dp)
+            .padding(MaterialTheme.spacing.small + MaterialTheme.spacing.extraSmall) // 12.dp
     ) {
         Column {
             prediction?.frame?.let { frame ->
@@ -83,7 +84,7 @@ fun PredictionResultBox(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp),
+                        .padding(top = MaterialTheme.spacing.small + MaterialTheme.spacing.extraSmall), // 12.dp
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -102,7 +103,7 @@ fun PredictionResultBox(
                         )
                     }
                     
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(MaterialTheme.spacing.small + MaterialTheme.spacing.extraSmall)) // 12.dp
                     
                     FilledTonalIconButton(
                         onClick = onCorrect,
@@ -115,7 +116,7 @@ fun PredictionResultBox(
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = "Correct",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(MaterialTheme.spacing.large) // 24.dp
                         )
                     }
                 }
@@ -139,7 +140,7 @@ private fun PredictionResult(
     prediction: CharacterPrediction
 ) {
     Column(
-        modifier = modifier.padding(start = 12.dp),
+        modifier = modifier.padding(start = MaterialTheme.spacing.small + MaterialTheme.spacing.extraSmall), // 12.dp
         verticalArrangement = Arrangement.Center
     ) {
         Text(
@@ -154,7 +155,7 @@ private fun PredictionResult(
                 color = Color.Black.copy(alpha = 0.7f)
             )
             Icon(
-                modifier = Modifier.padding(start = 8.dp).size(16.dp),
+                modifier = Modifier.padding(start = MaterialTheme.spacing.small).size(MaterialTheme.spacing.medium), // 8.dp / 16.dp
                 imageVector = prediction.icon,
                 contentDescription = null,
                 tint = Color.Black.copy(alpha = 0.7f)
@@ -171,12 +172,12 @@ private fun PredictionFrame(
     Box(
         modifier
             .background(Color.White)
-            .padding(2.dp)
+            .padding(MaterialTheme.spacing.extraSmall / 2) // 2.dp
     ) {
         Image(
             bitmap = frame.asImageBitmap(),
             contentDescription = null,
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(MaterialTheme.spacing.doubleExtraLarge) // 48.dp
         )
     }
 }

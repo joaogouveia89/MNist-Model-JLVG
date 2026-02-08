@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -20,12 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import io.github.joaogouveia89.inksight.core.ui.components.CameraPermissionScreen
+import io.github.joaogouveia89.inksight.core.ui.theme.spacing
 import io.github.joaogouveia89.inksight.digit_recognition.ui.components.CameraLifecycleManager
 import io.github.joaogouveia89.inksight.digit_recognition.ui.components.DigitRecognitionContainer
 
@@ -67,7 +68,7 @@ fun DigitRecognitionScreen(
                 onClick = onNavigateToHistory,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 40.dp, end = 16.dp) // Adjusted for status bar/safe area
+                    .padding(top = MaterialTheme.spacing.doubleExtraLarge, end = MaterialTheme.spacing.medium) // Adjusted for status bar/safe area
             ) {
                 Icon(
                     imageVector = Icons.Outlined.History,
@@ -86,7 +87,7 @@ fun DigitRecognitionScreen(
             hostState = snackbarHostState,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp)
+                .padding(bottom = MaterialTheme.spacing.medium)
         )
     }
 }

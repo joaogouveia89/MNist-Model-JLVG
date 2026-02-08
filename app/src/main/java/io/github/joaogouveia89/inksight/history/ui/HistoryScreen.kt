@@ -50,6 +50,7 @@ import io.github.joaogouveia89.inksight.R
 import io.github.joaogouveia89.inksight.core.ui.theme.SuccessGreen
 import io.github.joaogouveia89.inksight.core.ui.theme.ErrorRed
 import io.github.joaogouveia89.inksight.core.ui.theme.MNistModelAppTheme
+import io.github.joaogouveia89.inksight.core.ui.theme.spacing
 import io.github.joaogouveia89.inksight.history.domain.model.HistoryItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,15 +96,15 @@ fun AccuracyHeader(accuracyRate: Float) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(MaterialTheme.spacing.medium),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(MaterialTheme.spacing.medium)
     ) {
         Row(
             modifier = Modifier
-                .padding(24.dp)
+                .padding(MaterialTheme.spacing.large)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -137,9 +138,9 @@ fun AccuracyHeader(accuracyRate: Float) {
 fun HistoryGrid(items: List<HistoryItem>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(MaterialTheme.spacing.medium),
+        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small + MaterialTheme.spacing.extraSmall), // 12.dp
+        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.small + MaterialTheme.spacing.extraSmall), // 12.dp
         modifier = Modifier.fillMaxSize()
     ) {
         items(items) { item ->
@@ -183,24 +184,29 @@ fun HistoryCard(item: HistoryItem) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .size(24.dp)
-                        .background(
-                            color = if (item.isCorrect) SuccessGreen else ErrorRed,
-                            shape = CircleShape
-                        ),
+                        .padding(MaterialTheme.spacing.small),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = if (item.isCorrect) Icons.Default.Check else Icons.Default.Close,
-                        contentDescription = if (item.isCorrect) stringResource(R.string.common_correct) else stringResource(R.string.common_incorrect),
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(16.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(
+                                color = if (item.isCorrect) SuccessGreen else ErrorRed,
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (item.isCorrect) Icons.Default.Check else Icons.Default.Close,
+                            contentDescription = if (item.isCorrect) stringResource(R.string.common_correct) else stringResource(R.string.common_incorrect),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(MaterialTheme.spacing.medium)
+                        )
+                    }
                 }
             }
 
-            Column(modifier = Modifier.padding(12.dp)) {
+            Column(modifier = Modifier.padding(MaterialTheme.spacing.small + MaterialTheme.spacing.extraSmall)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -248,10 +254,10 @@ fun EmptyState() {
         Icon(
             imageVector = Icons.Default.History,
             contentDescription = null,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(tripleExtraLargeSize()),
             tint = MaterialTheme.colorScheme.outline
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
         Text(
             text = stringResource(R.string.history_empty_title),
             style = MaterialTheme.typography.titleMedium,
@@ -264,6 +270,9 @@ fun EmptyState() {
         )
     }
 }
+
+@Composable
+private fun tripleExtraLargeSize() = 64.dp // Keep it fixed or move to Dimens if reused
 
 @Preview(showBackground = true)
 @Composable
