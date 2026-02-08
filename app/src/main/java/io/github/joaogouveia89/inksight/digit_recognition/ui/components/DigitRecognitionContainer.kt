@@ -3,7 +3,10 @@ package io.github.joaogouveia89.inksight.digit_recognition.ui.components
 import androidx.camera.compose.CameraXViewfinder
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -12,8 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,20 +30,12 @@ fun DigitRecognitionContainer(
     onCorrect: () -> Unit = {},
     onIncorrect: () -> Unit = {},
 ) {
-    val configuration = LocalConfiguration.current
-    val density = LocalDensity.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeight = configuration.screenHeightDp.dp
-    
-    val rectWidth = screenWidth * maskSize
-    val topOffset = (screenHeight - rectWidth) / 2f
-
     Box(modifier = modifier.fillMaxSize()) {
+        // Camera Preview (Background)
         when (val surfaceRequest = uiState.surfaceRequest) {
             null -> {
                 CameraLoadingState()
             }
-
             else -> {
                 CameraXViewfinder(
                     surfaceRequest = surfaceRequest,
@@ -51,27 +44,45 @@ fun DigitRecognitionContainer(
             }
         }
 
+        // Mask Overlay
         CameraMaskOverlay(
             maskSize = maskSize
         )
 
-        // Guidance Text above the mask
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = (topOffset - 40.dp).coerceAtLeast(16.dp))
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.digit_recognition_position_guidance),
-                color = Color.White,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+        // Guidance Layout: Mirrors the mask logic using weights and aspect ratio
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Top section: Takes exactly half of the remaining vertical space
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Text(
+                    text = stringResource(R.string.digit_recognition_position_guidance),
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 16.dp) // Fixed gap between text and mask
+                )
+            }
+
+            // Middle section: Represents the mask hole area
+            // aspectRatio(width/height). Since height = width * maskSize, ratio = 1/maskSize
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f / maskSize)
             )
+
+            // Bottom section: Takes the other half of the vertical space
+            Spacer(modifier = Modifier.weight(1f))
         }
 
+        // Prediction Result Box
         if (uiState.prediction != null || uiState.isLoading) {
             PredictionResultBox(
                 modifier = Modifier.align(Alignment.BottomCenter),
