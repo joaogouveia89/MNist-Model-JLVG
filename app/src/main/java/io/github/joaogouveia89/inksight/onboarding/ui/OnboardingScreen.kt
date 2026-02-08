@@ -1,15 +1,11 @@
 package io.github.joaogouveia89.inksight.onboarding.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -29,15 +25,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import io.github.joaogouveia89.inksight.BuildConfig
 import io.github.joaogouveia89.inksight.R
 import io.github.joaogouveia89.inksight.core.ui.theme.spacing
+import io.github.joaogouveia89.inksight.onboarding.ui.components.OnboardingCameraPage
+import io.github.joaogouveia89.inksight.onboarding.ui.components.OnboardingHistoryPage
+import io.github.joaogouveia89.inksight.onboarding.ui.components.OnboardingReadyPage
+import io.github.joaogouveia89.inksight.onboarding.ui.components.OnboardingWelcomePage
 import kotlinx.coroutines.launch
 
 @Composable
@@ -69,7 +63,12 @@ fun OnboardingScreen(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
-                OnboardingPage(page)
+                when (page) {
+                    0 -> OnboardingWelcomePage()
+                    1 -> OnboardingCameraPage()
+                    2 -> OnboardingHistoryPage()
+                    3 -> OnboardingReadyPage()
+                }
             }
 
             // Footer
@@ -117,103 +116,6 @@ fun OnboardingScreen(
                         Icon(Icons.Default.ChevronRight, contentDescription = null)
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun OnboardingPage(page: Int) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(MaterialTheme.spacing.large),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        when (page) {
-            0 -> {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_app_icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp)
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                Text(
-                    text = stringResource(R.string.onboarding_page1_title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = stringResource(R.string.onboarding_page1_version, BuildConfig.VERSION_NAME),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                Text(
-                    text = stringResource(R.string.onboarding_page1_description),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            1 -> {
-                Text(
-                    text = stringResource(R.string.onboarding_page2_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                Icon(
-                    painter = painterResource(id = android.R.drawable.ic_menu_camera),
-                    contentDescription = null,
-                    modifier = Modifier.size(100.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                Text(
-                    text = stringResource(R.string.onboarding_page2_description),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            2 -> {
-                Text(
-                    text = stringResource(R.string.onboarding_page3_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                Text(
-                    text = stringResource(R.string.onboarding_page3_description1),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                Text(
-                    text = stringResource(R.string.onboarding_page3_description2),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            3 -> {
-                Text(
-                    text = stringResource(R.string.onboarding_page4_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.large))
-                Text(
-                    text = stringResource(R.string.onboarding_page4_description1),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.height(MaterialTheme.spacing.medium))
-                Text(
-                    text = stringResource(R.string.onboarding_page4_description2),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
             }
         }
     }
